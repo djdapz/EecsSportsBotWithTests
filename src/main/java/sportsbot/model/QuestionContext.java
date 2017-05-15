@@ -1,7 +1,10 @@
 package sportsbot.model;
 
+import sportsbot.enums.QuestionType;
 import sportsbot.enums.Sport;
 import sportsbot.enums.TemporalContext;
+import sportsbot.service.NewsService;
+import sportsbot.service.SportsApiService;
 
 import java.util.Random;
 
@@ -21,6 +24,33 @@ public class QuestionContext {
     private boolean error = false;
     private String errorMessage;
     private final Integer id;
+    private City city;
+    private boolean clarification;
+    private QuestionType questionType = QuestionType.GAME_SCORE;
+
+    public QuestionType getQuestionType() {
+        return questionType;
+    }
+
+    public void setQuestionType(QuestionType questionType) {
+        this.questionType = questionType;
+    }
+
+    public boolean isClarification() {
+        return clarification;
+    }
+
+    public void setClarification(boolean clarification) {
+        this.clarification = clarification;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
 
     public QuestionContext(Integer id) {
         this.id = id;

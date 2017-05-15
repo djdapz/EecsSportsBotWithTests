@@ -11,6 +11,7 @@ import sportsbot.enums.Sport;
 import sportsbot.enums.TemporalContext;
 import sportsbot.exception.AmbiguousTeamException;
 import sportsbot.exception.TeamNotFoundException;
+import sportsbot.model.City;
 import sportsbot.model.QuestionContext;
 import sportsbot.model.Team;
 
@@ -35,6 +36,7 @@ public class QuestionParserTest {
     private Team blackhawks;
     private Team bears;
     private Team bulls;
+    private City chicago;
     private QuestionContext questionContext;
 
 
@@ -47,6 +49,7 @@ public class QuestionParserTest {
         blackhawks = rosterService.getTeam(Sport.HOCKEY, "CHI");
         bears = rosterService.getTeam(Sport.FOOTBALL, "CHI");
         bulls = rosterService.getTeam(Sport.BASKETBALL, "CHI");
+        chicago = rosterService.getCity("Chicago");
     }
 
     @Test
@@ -133,46 +136,51 @@ public class QuestionParserTest {
         assertEquals(questionContext.getSport(), Sport.BASEBALL);
         assertEquals(questionContext.getTeam(), cubs);
 
+        questionContext = new QuestionContext();
         questionContext.setQuestion("blackhawks");
         questionParser.determineTeamAndSport(questionContext);
-
-        if( questionContext.getSport()  != Sport.HOCKEY){
-            System.out.println(questionContext.toString());
-        }
-
         assertEquals(questionContext.getSport(), Sport.HOCKEY);
         assertEquals(questionContext.getTeam(), blackhawks);
 
+        questionContext = new QuestionContext();
         questionContext.setQuestion("white sox");
         questionParser.determineTeamAndSport(questionContext);
         assertEquals(questionContext.getSport(), Sport.BASEBALL);
         assertEquals(questionContext.getTeam(), whitesox);
 
+        questionContext = new QuestionContext();
         questionContext.setQuestion("bears");
         questionParser.determineTeamAndSport(questionContext);
         assertEquals(questionContext.getSport(), Sport.FOOTBALL);
         assertEquals(questionContext.getTeam(), bears);
 
+        questionContext = new QuestionContext();
         questionContext.setQuestion("bulls");
         questionParser.determineTeamAndSport(questionContext);
         assertEquals(questionContext.getSport(), Sport.BASKETBALL);
         assertEquals(questionContext.getTeam(), bulls);
     }
 
+
+
     @Test
     public void getsAllChicagoTeamsWithJustCityNameThatArePossible() throws Exception {
+        questionContext = new QuestionContext();
         questionContext.setQuestion("chicago");
-
         questionContext.setSport(Sport.HOCKEY);
         questionParser.determineTeamAndSport(questionContext);
         assertEquals(questionContext.getSport(), Sport.HOCKEY);
         assertEquals(questionContext.getTeam(), blackhawks);
 
+        questionContext = new QuestionContext();
+        questionContext.setQuestion("chicago");
         questionContext.setSport(Sport.FOOTBALL);
         questionParser.determineTeamAndSport(questionContext);
         assertEquals(questionContext.getSport(), Sport.FOOTBALL);
         assertEquals(questionContext.getTeam(), bears);
 
+        questionContext = new QuestionContext();
+        questionContext.setQuestion("chicago");
         questionContext.setSport(Sport.BASKETBALL);
         questionParser.determineTeamAndSport(questionContext);
         assertEquals(questionContext.getSport(), Sport.BASKETBALL);
@@ -215,13 +223,13 @@ public class QuestionParserTest {
     public void whenSportAndCityInContextButNotQuestionItCanFigureItOut() throws Exception{
         questionContext.setQuestion("what about tomorrow");
         questionContext.setTemporalContext(TemporalContext.TODAY);
-        questionContext.setSport(Sport.BASEBALL);
-        //questionContext.setCity(chicago)
+        questionContext.setSport(Sport.HOCKEY);
+        questionContext.setCity(chicago);
 
         questionParser.parse(questionContext);
 
-        assertEquals(questionContext.getSport(), Sport.BASEBALL);
-        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getSport(), Sport.HOCKEY);
+        assertEquals(questionContext.getTeam(), blackhawks);
         assertEquals(questionContext.getTemporalContext(), TemporalContext.TOMORROW);
     }
 

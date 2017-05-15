@@ -2,11 +2,9 @@ package sportsbot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sportsbot.enums.QuestionType;
 import sportsbot.exception.*;
-import sportsbot.model.Game;
-import sportsbot.model.QuestionContext;
-import sportsbot.model.Roster;
-import sportsbot.model.Team;
+import sportsbot.model.*;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -25,19 +23,22 @@ public class QuestionProcessor {
     @Autowired
     private QuestionParser questionParser;
 
+    @Autowired
+    private NewsService newsService;
+
     private SportsApiService sportsApiRequester = new SportsApiService();
 
     private Roster roster;
     private HashMap<String, Team> teams;
 
-    public QuestionContext answer(QuestionContext questionContext) {
+    public QuestionContext answer(QuestionContext questionContext) throws AmbiguousTeamException{
         //update every time?
 
         try {
             questionParser.parse(questionContext);
         } catch (AmbiguousTeamException e) {
             //TODO ACTUALY FOLLOW UP!!!
-            questionContext.setResponse("Sorry, I'm not sure which team from " + e.getCity().getName() + " you're asking about");
+            throw e;
         } catch (TeamNotFoundException e) {
             questionContext.setResponse("I couldn't find the team you were asking about");
             return questionContext;
@@ -45,22 +46,30 @@ public class QuestionProcessor {
 
         LinkedHashMap todaysGameMap = null;
 
-        try {
-            todaysGameMap = sportsApiRequester.getTodaysGame(questionContext);
-        } catch (SportsBotException e) {
-            e.setErrorMessage(questionContext);
+
+
+
+        if(questionContext.getQuestionType() == QuestionType.NEWS){
+            Story story = newsService.getNewsStory(questionContext);
+            questionContext.setResponse(story.toString());
+            return questionContext;
+        }else{
+            try {
+                todaysGameMap = sportsApiRequester.getTodaysGame(questionContext);
+            } catch (SportsBotException e) {
+                e.setErrorMessage(questionContext);
+                return questionContext;
+            }
+
+            Game thisGame = new Game();
+
+            roster = rosterService.getRoster(questionContext.getSport());
+            thisGame.buildFromScoreboard(todaysGameMap, roster);
+
+            questionContext.setResponse(thisGame.generateGameStatusString(questionContext));
+
             return questionContext;
         }
-
-        Game thisGame = new Game();
-
-        roster = rosterService.getRoster(questionContext.getSport());
-        thisGame.buildFromScoreboard(todaysGameMap, roster);
-
-        questionContext.setResponse(thisGame.generateGameStatusString(questionContext));
-
-        return questionContext;
-
     }
 
 

@@ -13,11 +13,11 @@ import java.util.HashSet;
  */
 public class City {
     private final String name;
-    private HashSet<Team> teams;
+    private ArrayList<Team> teams;
     private HashMap<Sport, ArrayList<Team>> teamsBySport;
 
     public City(String name){
-        this.teams = new HashSet<>();
+        this.teams = new ArrayList<>();
         this.teamsBySport = new HashMap<>();
         this.name = name;
     }
@@ -26,8 +26,12 @@ public class City {
         return name;
     }
 
-    public HashSet<Team> getTeams() {
+    public ArrayList<Team> getTeams() {
         return teams;
+    }
+
+    public ArrayList<Team> getTeams(Sport sport) {
+        return teamsBySport.get(sport);
     }
 
     public void addTeam(Team team){

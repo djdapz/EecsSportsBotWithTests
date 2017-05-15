@@ -58,10 +58,9 @@ public class Roster {
 
         String cityName = teamResult.get("City");
 
-        cities.computeIfAbsent(cityName, City::new);
-        team.setCity(cities.get(cityName));
-        cities.get(cityName).addTeam(team);
-
+        cities.computeIfAbsent(cityName.toLowerCase(), City::new);
+        team.setCity(cities.get(cityName.toLowerCase()));
+        cities.get(cityName.toLowerCase()).addTeam(team);
 
         return team;
     }

@@ -5,6 +5,7 @@ import sportsbot.enums.Sport;
 import sportsbot.exception.AmbiguousTeamException;
 import sportsbot.exception.TeamNotFoundException;
 import sportsbot.model.City;
+import sportsbot.model.QuestionContext;
 import sportsbot.model.Roster;
 import sportsbot.model.Team;
 
@@ -59,7 +60,7 @@ public class RosterService {
         return rosters.get(sport).getTeams().get(teamAbbr);
     }
 
-    public Team findTeam(String query) throws TeamNotFoundException, AmbiguousTeamException {
+    public Team findTeam(String query, QuestionContext questionContext) throws TeamNotFoundException, AmbiguousTeamException {
         City cityInQuestion = null;
         query = query.toLowerCase();
 
@@ -70,9 +71,14 @@ public class RosterService {
             }
         }
 
-        HashSet<Team> teamsToSearch;
+        ArrayList<Team> teamsToSearch;
         if(cityInQuestion == null){
-            teamsToSearch = allTeams;
+            if(questionContext.getCity() != null){
+                cityInQuestion = questionContext.getCity();
+                teamsToSearch = cityInQuestion.getTeams();
+            }else{
+                teamsToSearch =  new ArrayList<>(allTeams);
+            }
         }else{
             teamsToSearch = cityInQuestion.getTeams();
         }
@@ -88,6 +94,11 @@ public class RosterService {
                 }
             }
             if(teamsFound.size() == 0){
+                //See if we have a sport context to go off of
+                if(questionContext.getSport() != null){
+                    return cityInQuestion.findTeam(questionContext.getSport());
+                }
+
                 if(cityInQuestion == null){
                     throw new TeamNotFoundException();
                 }else{
@@ -100,6 +111,10 @@ public class RosterService {
             }
 
         }
+    }
+
+    public City getCity(String cityName){
+        return cities.get(cityName.toLowerCase());
     }
 
 }

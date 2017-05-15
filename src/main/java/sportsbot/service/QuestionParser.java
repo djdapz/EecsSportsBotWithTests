@@ -21,6 +21,7 @@ public class QuestionParser {
         this.determineTemporalContest(questionContext);
         try {
             this.determineTeamAndSport(questionContext);
+            this.determineQuestionType(questionContext);
         } catch (AmbiguousTeamException e) {
             throw e;
         } catch (TeamNotFoundException e) {
@@ -29,6 +30,10 @@ public class QuestionParser {
             }
         }
 
+    }
+
+    private void determineQuestionType(QuestionContext questionContext) {
+        //TODO - IMPLEMENT
     }
 
     public void determineTemporalContest(QuestionContext questionContext){
@@ -49,8 +54,9 @@ public class QuestionParser {
         String question = questionContext.getQuestion().toLowerCase();
 
         try{
-            Team team = rosterService.findTeam(question);
+            Team team = rosterService.findTeam(question, questionContext);
             questionContext.setTeam(team);
+            questionContext.setCity(team.getCity());
         }catch(AmbiguousTeamException e){
             City city = e.getCity();
             if(questionContext.getSport() == null){
@@ -60,6 +66,7 @@ public class QuestionParser {
                 //if we have a context to go off of, we try and find the team.
                 try {
                     questionContext.setTeam(city.findTeam(questionContext.getSport()));
+                    questionContext.setCity(city);
                 } catch (Exception ee) {
                     //IF it's an Unclear Team Exception
                         // Example --> Sport = Baseball ==> How did new york do?

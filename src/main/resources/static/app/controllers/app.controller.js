@@ -1,6 +1,9 @@
 
-var AppController = function($scope, QuestionService) {
+var AppController = function($scope, $timeout, QuestionService) {
     $scope.conversationId = undefined;
+
+    $scope.waiting = false;
+    $scope.waitingText = '...';
 
     $scope.chat = [
         {
@@ -22,6 +25,7 @@ var AppController = function($scope, QuestionService) {
 
                 //success
                 function(response){
+                    $scope.waiting = false;
                     $scope.chat.unshift({
                         role: "CHATBOT",
                         text: response.data.response
@@ -32,6 +36,7 @@ var AppController = function($scope, QuestionService) {
 
                 //failure
                 function(error){
+                    $scope.waiting = false;
                     $scope.chat.unshift({
                         role: "CHATBOT",
                         text: "ERROR: reaching server"
@@ -41,9 +46,21 @@ var AppController = function($scope, QuestionService) {
             );
 
             $scope.queryText = undefined;
+            $scope.waiting = true;
 
         }
     };
+
+    function animateWaitingText(){
+        if($scope.waitingText.length >= 3){
+            $scope.waitingText = "."
+        }else{
+            $scope.waitingText.append('.');
+        }
+        $timeout(animateWaitingText, 500);
+    }
+
+    animateWaitingText();
 
 
 };
@@ -52,5 +69,5 @@ angular
     .module('myApp')
     .controller("AppController", AppController );
 
-AppController.$inject = ['$scope', "QuestionService"];
+AppController.$inject = ['$scope', "$timeout", "QuestionService"];
 
