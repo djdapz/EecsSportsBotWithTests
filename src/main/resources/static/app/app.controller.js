@@ -55,9 +55,9 @@ var AppController = function($scope, $timeout, QuestionService) {
         if($scope.waitingText.length >= 3){
             $scope.waitingText = "."
         }else{
-            $scope.waitingText.append('.');
+            $scope.waitingText+= '.';
         }
-        $timeout(animateWaitingText, 500);
+        $timeout(animateWaitingText, 300);
     }
 
     animateWaitingText();

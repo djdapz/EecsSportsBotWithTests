@@ -1,5 +1,6 @@
 package sportsbot.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sportsbot.enums.Sport;
 import sportsbot.exception.AmbiguousTeamException;
@@ -29,7 +30,8 @@ public class RosterService {
     private HashMap<String, City> cities;
     private HashSet<Team> allTeams;
 
-    private SportsApiService requester = new SportsApiService();
+    @Autowired
+    private SportsApiService requester;
 
     public RosterService(){
         rosters = new HashMap<>();
@@ -94,6 +96,10 @@ public class RosterService {
                 }
             }
             if(teamsFound.size() == 0){
+                //if we already have a team and haven't found a new city and no new information, run with it
+                if(questionContext.getTeam()!= null && cityInQuestion == questionContext.getCity()){
+                    return questionContext.getTeam();
+                }
                 //See if we have a sport context to go off of
                 if(questionContext.getSport() != null){
                     return cityInQuestion.findTeam(questionContext.getSport());

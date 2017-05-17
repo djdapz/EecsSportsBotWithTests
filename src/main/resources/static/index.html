@@ -21,6 +21,11 @@
         </div>
 
         <div id="chat-space">
+            <div ng-if="waiting">
+                <div class="row">
+                    <p class="CHATBOT-chat">{{waitingText}}</p>
+                </div>
+            </div>
             <div ng-repeat="phrase in chat" class="row">
                 <p class="{{phrase.role}}-chat">{{phrase.text}}</p>
             </div>
@@ -38,7 +43,7 @@
 
     <!--APP-->
     <script type="text/javascript" src="./app/app.module.js"></script>
-    <script type="text/javascript" src="app/controllers/app.controller.js"></script>
+    <script type="text/javascript" src="app/app.controller.js"></script>
     <script type="text/javascript" src="app/services/questionService.js"></script>
 </body>
 

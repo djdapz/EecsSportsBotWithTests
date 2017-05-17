@@ -67,6 +67,8 @@ public class QuestionController {
                     clarification += teams.get(i).getName();
                 }
                 clarification += "?";
+                questionContext.clearTeam();
+                questionContext.setCity(e.getCity());
                 questionContext.setResponse(clarification);
             }
         }

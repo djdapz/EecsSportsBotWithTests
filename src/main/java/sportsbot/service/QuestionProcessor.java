@@ -26,10 +26,12 @@ public class QuestionProcessor {
     @Autowired
     private NewsService newsService;
 
-    private SportsApiService sportsApiRequester = new SportsApiService();
+    @Autowired
+    private SportsApiService sportsApiRequester;
 
     private Roster roster;
     private HashMap<String, Team> teams;
+
 
     public QuestionContext answer(QuestionContext questionContext) throws AmbiguousTeamException{
         //update every time?
