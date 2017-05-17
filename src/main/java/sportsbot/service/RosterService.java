@@ -64,6 +64,7 @@ public class RosterService {
 
     public Team findTeam(String query, QuestionContext questionContext) throws TeamNotFoundException, AmbiguousTeamException {
         City cityInQuestion = null;
+        Team teamInQuestion = null;
         query = query.toLowerCase();
 
         for(City city: cities.values()){
@@ -72,6 +73,19 @@ public class RosterService {
                 break;
             }
         }
+
+        for(Team team: allTeams){
+            if(query.contains(team.getName().toLowerCase())){
+                teamInQuestion = team;
+                break;
+            }
+        }
+
+
+        if(teamInQuestion != null){
+            return teamInQuestion;
+        }
+
 
         ArrayList<Team> teamsToSearch;
         if(cityInQuestion == null){
