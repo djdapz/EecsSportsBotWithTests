@@ -2,10 +2,15 @@ package sportsbot.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import sportsbot.enums.QuestionType;
 import sportsbot.enums.TemporalContext;
 import sportsbot.exception.AmbiguousTeamException;
 import sportsbot.exception.TeamNotFoundException;
 import sportsbot.model.*;
+
+// import regex
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by devondapuzzo on 5/10/17.
@@ -32,8 +37,16 @@ public class QuestionParser {
 
     }
 
+    // should run after parse the question and figure out the team, player and city
     private void determineQuestionType(QuestionContext questionContext) {
         //TODO - IMPLEMENT
+        if (questionContext.getQuestion().toLowerCase().contains("more") || questionContext.getQuestion().toLowerCase().contains("story")) {
+            if (questionContext.getTeam() != null || questionContext.getPreviousQuestion().getTeam() != null) {
+                questionContext.setQuestionType(QuestionType.NEWS);
+                return;
+            }
+        }
+        questionContext.setQuestionType(QuestionType.GAME_SCORE);
     }
 
     public void determineTemporalContest(QuestionContext questionContext){

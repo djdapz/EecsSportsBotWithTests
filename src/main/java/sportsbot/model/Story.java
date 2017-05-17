@@ -6,7 +6,14 @@ package sportsbot.model;
 public class Story {
     private String storyString;
     private String link;
-
+//    public Story () {
+//        this.storyString = null;
+//        this.link = null;
+//    }
+    public Story (String storyString, String link) {
+        this.storyString = storyString;
+        this.link = link;
+    }
     public String getStoryString() {
         return storyString;
     }
@@ -24,6 +31,6 @@ public class Story {
     }
 
     public String toString(){
-        return storyString + " \n \n" + "Source: " + link;
+        return storyString + "\nSource: " + link;
     }
 }
