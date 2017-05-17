@@ -137,6 +137,10 @@ public class QuestionContext {
         this.sport = team.getSport();
     }
 
+    public void clearTeam() {
+        this.team = null;
+    }
+
     public QuestionContext getPreviousQuestion() {
         return previousQuestion;
     }

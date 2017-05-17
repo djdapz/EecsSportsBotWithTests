@@ -27,7 +27,7 @@ import sun.awt.image.ImageWatched;
 public class SportsApiService {
 
 
-    private HttpHeaders createHeaders(final String username, final String password ){
+    private static HttpHeaders createHeaders(final String username, final String password ){
         HttpHeaders headers =  new HttpHeaders(){
             {
                 String auth = username + ":" + password;
@@ -43,11 +43,11 @@ public class SportsApiService {
         return headers;
     }
 
-    private ResponseEntity<Object> contactApi(Sport sport, String requestType, Integer offset){
+    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, Integer offset){
         RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders httpHeaders = this.createHeaders("djdapz", "goCats");
+        HttpHeaders httpHeaders = createHeaders("djdapz", "goCats");
 
-        String dateString = this.getToday(offset);
+        String dateString = getToday(offset);
 
         String seasonString = sport.getSeasonString();
 
@@ -57,13 +57,13 @@ public class SportsApiService {
         return restTemplate.exchange(urlString, HttpMethod.GET, new HttpEntity<Object>(httpHeaders), Object.class);
     }
 
-    private ResponseEntity<Object> contactApi(Sport sport, String requestType){
+    private static ResponseEntity<Object> contactApi(Sport sport, String requestType){
         return contactApi(sport, requestType, 0);
     }
 
-    public ArrayList<LinkedHashMap> getRostersFromAPI(Sport sport){
+    public static ArrayList<LinkedHashMap> getRostersFromAPI(Sport sport){
 
-        ResponseEntity<Object> response = this.contactApi(sport, "roster_players");
+        ResponseEntity<Object> response = contactApi(sport, "roster_players");
 
         LinkedHashMap<String, LinkedHashMap> roster = (LinkedHashMap<String, LinkedHashMap>) response.getBody();
         return (ArrayList<LinkedHashMap>) roster.get("rosterplayers").get("playerentry");
@@ -71,7 +71,7 @@ public class SportsApiService {
 
 
 
-    public LinkedHashMap getTodaysGame(QuestionContext questionContext) throws TeamNotPlayingException, ServerContactException {
+    public static LinkedHashMap getTodaysGame(QuestionContext questionContext) throws TeamNotPlayingException, ServerContactException {
 
         Team team = questionContext.getTeam();
         TemporalContext temporalContext = questionContext.getTemporalContext();
@@ -81,12 +81,12 @@ public class SportsApiService {
 
         if(questionContext.getTemporalContext() == TemporalContext.YESTERDAY){
             offset = -1;
-            response = this.contactApi(questionContext.getSport(), "scoreboard", offset);
+            response = contactApi(questionContext.getSport(), "scoreboard", offset);
         }else {
             if(questionContext.getTemporalContext() == TemporalContext.TOMORROW){
                 offset = 1;
             }
-            response = this.contactApi(questionContext.getSport(),"scoreboard", offset);
+            response = contactApi(questionContext.getSport(),"scoreboard", offset);
         }
 
 
@@ -97,28 +97,31 @@ public class SportsApiService {
         LinkedHashMap<String, LinkedHashMap> responseResult = (LinkedHashMap<String, LinkedHashMap>) response.getBody();
         ArrayList<LinkedHashMap>  games = (ArrayList<LinkedHashMap>) responseResult.get("scoreboard").get("gameScore");
 
-        for(int i = 0; i < games.size(); i++){
-            LinkedHashMap todaysScore = games.get(i);
-            LinkedHashMap todaysGame = (LinkedHashMap) todaysScore.get("game");
-            LinkedHashMap homeTeamMap = (LinkedHashMap) todaysGame.get("awayTeam");
-            LinkedHashMap awayTeamMap = (LinkedHashMap) todaysGame.get("homeTeam");
+        if(games != null){
+            for(int i = 0; i < games.size(); i++){
+                LinkedHashMap todaysScore = games.get(i);
+                LinkedHashMap todaysGame = (LinkedHashMap) todaysScore.get("game");
+                LinkedHashMap homeTeamMap = (LinkedHashMap) todaysGame.get("awayTeam");
+                LinkedHashMap awayTeamMap = (LinkedHashMap) todaysGame.get("homeTeam");
 
-            String homeTeamAbbr = (String) homeTeamMap.get("Abbreviation");
-            String awayTeamAbbr = (String) awayTeamMap.get("Abbreviation");
+                String homeTeamAbbr = (String) homeTeamMap.get("Abbreviation");
+                String awayTeamAbbr = (String) awayTeamMap.get("Abbreviation");
 
-            if(team.getAbbreviation().equals(homeTeamAbbr) ||team.getAbbreviation().equals(awayTeamAbbr)){
-                return todaysScore;
+                if(team.getAbbreviation().equals(homeTeamAbbr) ||team.getAbbreviation().equals(awayTeamAbbr)){
+                    return todaysScore;
+                }
             }
         }
+
 
         throw new TeamNotPlayingException(team);
     }
 
-    public String getToday(){
+    public static String getToday(){
         return getToday(0);
     }
 
-    public String getToday(Integer offset){
+    public static String getToday(Integer offset){
         Calendar now = Calendar.getInstance();
         now.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
 
