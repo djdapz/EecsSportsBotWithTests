@@ -27,7 +27,13 @@
                 </div>
             </div>
             <div ng-repeat="phrase in chat" class="row">
-                <p class="{{phrase.role}}-chat">{{phrase.text}}</p>
+                <p class="{{phrase.role}}-chat">
+                    {{phrase.text}}
+                    <span ng-if="phrase.source" >
+                        <br/>
+                        <a href="{{phrase.source}}" class="go-to-source">~View Source~</a>
+                    </span>
+                </p>
             </div>
         </div>
 
@@ -42,8 +48,9 @@
     <script type="text/javascript" src="./bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
 
     <!--APP-->
+
     <script type="text/javascript" src="./app/app.module.js"></script>
-    <script type="text/javascript" src="app/app.controller.js"></script>
+    <script type="text/javascript" src="./app/controller/newapp.controller.js"></script>
     <script type="text/javascript" src="app/services/questionService.js"></script>
 </body>
 

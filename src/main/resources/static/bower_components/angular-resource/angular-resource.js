@@ -279,7 +279,7 @@ function shallowClearAndCopy(src, dst) {
      expect(newCard.id).toEqual(789);
  * ```
  *
- * The object returned from this function execution is a resource "class" which has "static" method
+ * The object returned from this function execution is a resource "class" which has "resources" method
  * for each action in the definition.
  *
  * Calling these methods invoke `$http` on the `url` template with the given `method`, `params` and

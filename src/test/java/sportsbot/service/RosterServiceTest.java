@@ -7,7 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import sportsbot.model.City;
 
-import static org.junit.Assert.*;
+import resources org.junit.Assert.*;
 
 /**
  * Created by devondapuzzo on 5/15/17.

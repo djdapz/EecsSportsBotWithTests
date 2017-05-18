@@ -12,6 +12,12 @@ import java.util.Random;
  * Created by devondapuzzo on 4/19/17.
  */
 public class QuestionContext {
+    //whitelist
+    //first line of story
+    //story content
+    // players
+    //buying tix
+
 
     private String question;
     private String response;
@@ -27,6 +33,19 @@ public class QuestionContext {
     private City city;
     private boolean clarification;
     private QuestionType questionType = QuestionType.GAME_SCORE;
+    private String source;
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
+    }
+
+    public void clearSource() {
+        this.source = null;
+    }
 
     public QuestionType getQuestionType() {
         return questionType;

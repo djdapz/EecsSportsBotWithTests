@@ -94,7 +94,13 @@ public class NewsService
 //                System.out.println(((JSONObject)news.get(0)).getString("name"));
 //                System.out.println(((JSONObject)news.get(0)).getString("description"));
 //                System.out.println(((JSONObject)news.get(0)).getString("url"));
-                String url = ((JSONObject)news.get((int)Math.floor((Math.random() * news.length())))).getString("url");
+
+
+                Integer newsKey = (int)Math.floor(Math.random() * news.length());
+
+                String url = ((JSONObject)news.get(newsKey)).getString("url");
+
+
                 Configuration configuration = new Configuration();
                 configuration.setMinBytesForImages(4500);
                 configuration.setLocalStoragePath("/tmp/goose");

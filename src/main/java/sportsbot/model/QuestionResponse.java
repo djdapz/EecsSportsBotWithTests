@@ -19,6 +19,7 @@ public class QuestionResponse {
     private boolean error = false;
     private String errorMessage;
     private int conversationId;
+    private String source;
 
     public QuestionResponse(QuestionContext questionContext) {
         this.question = questionContext.getQuestion();
@@ -28,6 +29,7 @@ public class QuestionResponse {
         this.error = questionContext.isError();
         this.errorMessage = questionContext.getErrorMessage();
         this.conversationId = questionContext.getId();
+        this.source = questionContext.getSource();
 
         if(questionContext.getGame() !=null){
             this.gameID = questionContext.getGame().getId();
@@ -37,6 +39,14 @@ public class QuestionResponse {
             this.teamAbbr = questionContext.getTeam().getAbbreviation();
         }
 
+    }
+
+    public String getSource() {
+        return source;
+    }
+
+    public void setSource(String source) {
+        this.source = source;
     }
 
     public int getConversationId() {

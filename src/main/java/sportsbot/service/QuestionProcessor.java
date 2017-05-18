@@ -53,9 +53,17 @@ public class QuestionProcessor {
 
         if(questionContext.getQuestionType() == QuestionType.NEWS){
             Story story = newsService.getNewsStory(questionContext);
-            questionContext.setResponse(story.toString());
-            return questionContext;
+            if(story == null){
+                questionContext.setResponse("Sorry, I couldn't find the story you're looking for. Please try again");
+                questionContext.setSource(null);
+                return questionContext;
+            }else{
+                questionContext.setResponse(story.getStoryString());
+                questionContext.setSource(story.getLink());
+                return questionContext;
+            }
         }else{
+            questionContext.clearSource();
             try {
                 todaysGameMap = sportsApiRequester.getTodaysGame(questionContext);
             } catch (SportsBotException e) {

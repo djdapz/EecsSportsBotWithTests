@@ -31,6 +31,6 @@ public class Story {
     }
 
     public String toString(){
-        return storyString + "\nSource: " + link;
+        return storyString + "Source: " + link;
     }
 }

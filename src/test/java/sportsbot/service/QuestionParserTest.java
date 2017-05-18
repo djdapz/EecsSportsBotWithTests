@@ -15,7 +15,7 @@ import sportsbot.model.City;
 import sportsbot.model.QuestionContext;
 import sportsbot.model.Team;
 
-import static org.junit.Assert.*;
+import resources org.junit.Assert.*;
 
 /**
  * Created by devondapuzzo on 5/10/17.
