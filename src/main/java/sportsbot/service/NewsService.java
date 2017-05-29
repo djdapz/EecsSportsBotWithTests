@@ -132,7 +132,7 @@ public class NewsService
             HttpEntity entity = response.getEntity();
             if (entity != null) {
                 JSONObject temp = new JSONObject(EntityUtils.toString(entity));
-                System.out.println(temp.toString(4));
+//                System.out.println(temp.toString(4));
 //                System.out.println(temp.keySet().toString());
 //                JSONObject temp2 = null;
 //                if (temp.has("news")) {
@@ -165,11 +165,12 @@ public class NewsService
                 Goose goose = new Goose(configuration);
                 Article article = goose.extractContent(url);
 //                System.out.println(article.cleanedArticleText());
-                if (article.cleanedArticleText().length() < 20) {
-                    return getNewsStory(qc);
-                } else {
-                    return new Story(article.cleanedArticleText().length() > 300? article.cleanedArticleText().substring(0, 300):article.cleanedArticleText(), url);
-                }
+//                if (article.cleanedArticleText().length() < 20) {
+//                    return getNewsStory(qc);
+//                } else {
+//                    return new Story(article.cleanedArticleText(), ((JSONObject)news.get(newsKey)).getString("description"), url);
+//                }
+                return new Story(article.cleanedArticleText(), ((JSONObject)news.get(newsKey)).getString("description"), url);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());

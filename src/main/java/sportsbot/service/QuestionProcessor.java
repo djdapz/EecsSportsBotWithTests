@@ -58,8 +58,13 @@ public class QuestionProcessor {
                 questionContext.setResponse("Sorry, I couldn't find the story you're looking for. Please try again");
                 questionContext.setSource(null);
                 return questionContext;
+<<<<<<< Updated upstream
             } else {
                 questionContext.setResponse(story.getStoryString());
+=======
+            }else{
+                questionContext.setResponse(story.getDescription());
+>>>>>>> Stashed changes
                 questionContext.setSource(story.getLink());
                 return questionContext;
             }
