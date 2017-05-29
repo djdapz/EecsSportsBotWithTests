@@ -1,22 +1,20 @@
 package sportsbot.service;
 
-import java.util.*;
-
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import sportsbot.enums.Sport;
-import sportsbot.enums.TemporalContext;
+import sportsbot.exception.PlayerHasntPlayedException;
 import sportsbot.exception.ServerContactException;
 import sportsbot.exception.TeamNotPlayingException;
-import sportsbot.model.Game;
+import sportsbot.model.Param;
 import sportsbot.model.QuestionContext;
 import sportsbot.model.Team;
-import sun.awt.image.ImageWatched;
+
+import java.util.*;
 
 
 /**
@@ -43,9 +41,11 @@ public class SportsApiService {
         return headers;
     }
 
-    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, Integer offset){
+    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, Integer offset, ArrayList<Param> params){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = createHeaders("djdapz", "goCats");
+
+        StringBuilder url = new StringBuilder();
 
         String dateString = getToday(offset);
 
@@ -53,12 +53,32 @@ public class SportsApiService {
 
         String sportString = sport.getURLstring();
 
-        String urlString = "https://www.mysportsfeeds.com/api/feed/pull/"+sportString+"/"+seasonString+"/"+requestType+".json?fordate="+dateString+"&force=true";
-        return restTemplate.exchange(urlString, HttpMethod.GET, new HttpEntity<Object>(httpHeaders), Object.class);
+        url.append("https://www.mysportsfeeds.com/api/feed/pull/")
+                .append(sportString)
+                .append("/")
+                .append(seasonString)
+                .append("/")
+                .append(requestType)
+                .append(".json?fordate=")
+                .append(dateString)
+                .append("&force=true");
+        if(params != null){
+            for(Param param: params){
+                url.append("&")
+                        .append(param.getTitle())
+                        .append("=")
+                        .append(param.getValue());
+            }
+        }
+        return restTemplate.exchange(url.toString(), HttpMethod.GET, new HttpEntity<Object>(httpHeaders), Object.class);
+    }
+
+    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, Integer offset){
+        return contactApi(sport, requestType, offset, null);
     }
 
     private static ResponseEntity<Object> contactApi(Sport sport, String requestType){
-        return contactApi(sport, requestType, 0);
+        return contactApi(sport, requestType, 0, null);
     }
 
     public static ArrayList<LinkedHashMap> getRostersFromAPI(Sport sport){
@@ -71,24 +91,12 @@ public class SportsApiService {
 
 
 
-    public static LinkedHashMap getTodaysGame(QuestionContext questionContext) throws TeamNotPlayingException, ServerContactException {
+    public static LinkedHashMap getGame(QuestionContext questionContext) throws TeamNotPlayingException, ServerContactException {
 
         Team team = questionContext.getTeam();
-        TemporalContext temporalContext = questionContext.getTemporalContext();
-        ResponseEntity<Object> response;
+        Integer offset = questionContext.getTemporalContext().getOffset();
 
-        Integer offset = 0;
-
-        if(questionContext.getTemporalContext() == TemporalContext.YESTERDAY){
-            offset = -1;
-            response = contactApi(questionContext.getSport(), "scoreboard", offset);
-        }else {
-            if(questionContext.getTemporalContext() == TemporalContext.TOMORROW){
-                offset = 1;
-            }
-            response = contactApi(questionContext.getSport(),"scoreboard", offset);
-        }
-
+        ResponseEntity<Object> response = contactApi(questionContext.getSport(),"scoreboard", offset);
 
         if(response.getStatusCode().value() != 200){
             throw new ServerContactException();
@@ -148,5 +156,45 @@ public class SportsApiService {
 
         return yearS + monthS + dayS;
 
+    }
+
+    public static ArrayList<LinkedHashMap> getPlayerStats(QuestionContext questionContext) throws ServerContactException, PlayerHasntPlayedException {
+
+        ArrayList<Param> params = new ArrayList<>();
+        params.add(new Param("player", questionContext.getPlayer().getUrlParam()));
+
+        ResponseEntity<Object> response = contactApi(questionContext.getSport(), "daily_player_stats", questionContext.getTemporalContext().getOffset(), params);
+
+        if(response.getStatusCode().value() != 200){
+            throw new ServerContactException();
+        }
+
+        LinkedHashMap<String, LinkedHashMap> responseResult = (LinkedHashMap<String, LinkedHashMap>) response.getBody();
+
+        ArrayList<LinkedHashMap> playerStats = (ArrayList<LinkedHashMap>) responseResult.get("dailyplayerstats").get("playerstatsentry");
+        if(playerStats == null){
+            throw new PlayerHasntPlayedException();
+        }else{
+            return playerStats;
+        }
+
+
+    }
+
+    public static ArrayList<LinkedHashMap<String, HashMap>> getStartingLineup(QuestionContext questionContext) throws ServerContactException {
+        assert(questionContext.getGame() != null);
+
+        ArrayList<Param> params = new ArrayList<>();
+        params.add(new Param("gameid", questionContext.getGame().getUrlParam()));
+
+
+        ResponseEntity<Object> response = contactApi(questionContext.getSport(), "game_startinglineup", questionContext.getTemporalContext().getOffset(), params);
+
+        if(response.getStatusCode().value() != 200){
+            throw new ServerContactException();
+        }
+
+        LinkedHashMap<String, LinkedHashMap> responseResult = (LinkedHashMap<String, LinkedHashMap>) response.getBody();
+        return (ArrayList<LinkedHashMap<String, HashMap>>) responseResult.get("gamestartinglineup").get("teamLineup");
     }
 }

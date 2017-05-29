@@ -16,7 +16,7 @@ public class AmbiguousTeamException extends SportsBotException{
 
     @Override
     public void setErrorMessage(QuestionContext questionContext) {
-        questionContext.setErrorMessage("AmbiguousTeamException");
+        questionContext.setResponse("AmbiguousTeamException");
     }
 
     public AmbiguousTeamException(City city){

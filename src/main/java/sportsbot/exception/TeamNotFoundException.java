@@ -8,6 +8,6 @@ import sportsbot.model.QuestionContext;
 public class TeamNotFoundException extends SportsBotException {
     @Override
     public void setErrorMessage(QuestionContext questionContext) {
-        questionContext.setErrorMessage("TeamNotFoundException");
+        questionContext.setResponse("I couldn't find the team you were asking about");
     }
 }

@@ -5,5 +5,7 @@ package sportsbot.enums;
  */
 public enum QuestionType {
     NEWS,
-    GAME_SCORE
+    GAME_SCORE,
+    PLAYER_PERFORMANCE,
+    POSITION_INFORMATION
 }

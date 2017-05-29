@@ -26,8 +26,6 @@ public class QuestionResponse {
         this.response = questionContext.getResponse();
         this.temporalContext = questionContext.getTemporalContext();
         this.sport = questionContext.getSport();
-        this.error = questionContext.isError();
-        this.errorMessage = questionContext.getErrorMessage();
         this.conversationId = questionContext.getId();
         this.source = questionContext.getSource();
 

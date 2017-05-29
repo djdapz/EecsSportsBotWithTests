@@ -6,7 +6,7 @@ import sportsbot.enums.Sport;
  * Created by devondapuzzo on 4/12/17.
  */
 public class Player {
-    private int ID;
+    private Integer ID;
     private String LastName;
     private String FirstName;
     private int JerseyNumber;
@@ -16,11 +16,11 @@ public class Player {
     private Team team;
     private Sport sport;
 
-    public int getID() {
+    public Integer getID() {
         return ID;
     }
 
-    public void setID(int ID) {
+    public void setID(Integer ID) {
         this.ID = ID;
     }
 
@@ -90,5 +90,11 @@ public class Player {
 
     public String toString(){
         return getLastName() + ", " + getFirstName();
+    }
+
+    public String getUrlParam(){return getFirstName().toLowerCase() + "-" + getLastName().toLowerCase() + "-" + getID();}
+
+    public String getName() {
+        return FirstName + " " + LastName;
     }
 }

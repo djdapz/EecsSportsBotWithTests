@@ -3,14 +3,18 @@ package sportsbot.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sportsbot.enums.QuestionType;
+import sportsbot.enums.StatCategory;
 import sportsbot.enums.TemporalContext;
 import sportsbot.exception.AmbiguousTeamException;
+import sportsbot.exception.PositionNotFoundException;
 import sportsbot.exception.TeamNotFoundException;
-import sportsbot.model.*;
+import sportsbot.model.City;
+import sportsbot.model.QuestionContext;
+import sportsbot.model.Team;
+
+import java.util.ArrayList;
 
 // import regex
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by devondapuzzo on 5/10/17.
@@ -20,36 +24,48 @@ import java.util.regex.Pattern;
 public class QuestionParser {
 
     @Autowired
-    private RosterService rosterService;
+    private  RosterService rosterService;
 
-    public void parse(QuestionContext questionContext) throws AmbiguousTeamException, TeamNotFoundException{
-        this.determineTemporalContest(questionContext);
+    @Autowired
+    private PositionsService positionsService;
+
+    public  void parse(QuestionContext questionContext) throws AmbiguousTeamException, TeamNotFoundException, PositionNotFoundException {
+        determineTemporalContest(questionContext);
         try {
-            this.determineTeamAndSport(questionContext);
-            this.determineQuestionType(questionContext);
-        } catch (AmbiguousTeamException e) {
+            determineTeamAndSport(questionContext);
+            searchForPlayer(questionContext);
+            determineQuestionType(questionContext);
+            if(questionContext.getQuestionType() == QuestionType.POSITION_INFORMATION){
+                determinePosition(questionContext);
+            }
+        } catch (AmbiguousTeamException | PositionNotFoundException e) {
             throw e;
         } catch (TeamNotFoundException e) {
             if(questionContext.getTeam() == null){
                 throw e;
             }
         }
-
     }
 
     // should run after parse the question and figure out the team, player and city
-    private void determineQuestionType(QuestionContext questionContext) {
+    private  void determineQuestionType(QuestionContext questionContext) {
         //TODO - IMPLEMENT
         if (questionContext.getQuestion().toLowerCase().contains("more") || questionContext.getQuestion().toLowerCase().contains("story")) {
             if (questionContext.getTeam() != null || questionContext.getPreviousQuestion().getTeam() != null) {
                 questionContext.setQuestionType(QuestionType.NEWS);
                 return;
             }
+        }else if(questionContext.getQuestion().toLowerCase().contains("who")){
+            questionContext.setQuestionType(QuestionType.POSITION_INFORMATION);
+        }else if(questionContext.getPlayer() != null){
+            questionContext.setQuestionType(QuestionType.PLAYER_PERFORMANCE);
+        }else{
+            questionContext.setQuestionType(QuestionType.GAME_SCORE);
         }
-        questionContext.setQuestionType(QuestionType.GAME_SCORE);
     }
 
-    public void determineTemporalContest(QuestionContext questionContext){
+    public  void determineTemporalContest(QuestionContext questionContext){
+        //TODO ask for dates
         String question = questionContext.getQuestion().toLowerCase();
 
         if(question.contains("today")){
@@ -63,7 +79,7 @@ public class QuestionParser {
         }
     }
 
-    public void determineTeamAndSport(QuestionContext questionContext) throws AmbiguousTeamException, TeamNotFoundException {
+    public  void determineTeamAndSport(QuestionContext questionContext) throws AmbiguousTeamException, TeamNotFoundException {
         String question = questionContext.getQuestion().toLowerCase();
 
         try{
@@ -92,8 +108,29 @@ public class QuestionParser {
         }catch(TeamNotFoundException e){
             throw e;
         }
-
     }
 
+    private  void searchForPlayer(QuestionContext questionContext) {
+        rosterService.findPlayer(questionContext);
+    }
 
+    public  ArrayList<StatCategory> determineStatCategories(QuestionContext questionContext) {
+        ArrayList<StatCategory> statCategories = new ArrayList<>();
+        String question = questionContext.getQuestion().toLowerCase();
+
+        if(question.contains(" bat") || question.contains(" offense") || question.contains(" run")){
+            statCategories.add(StatCategory.OFFENSIVE);
+        }
+
+        if(question.contains(" field") || question.contains(" defense") || question.contains(" pitch") || question.contains(" out")){
+            statCategories.add(StatCategory.DEFENSIVE);
+        }
+
+
+        return statCategories;
+    }
+
+    public void determinePosition(QuestionContext questionContext) throws PositionNotFoundException {
+        questionContext.setPosition(positionsService.findPosition(questionContext));
+    }
 }

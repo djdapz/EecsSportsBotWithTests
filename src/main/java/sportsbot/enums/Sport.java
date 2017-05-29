@@ -1,5 +1,8 @@
 package sportsbot.enums;
 
+import sportsbot.model.Player;
+import sportsbot.model.stats.PlayerGameStats;
+import sportsbot.model.stats.PlayerGameStatsBaseball;
 import sun.util.calendar.BaseCalendar;
 
 import java.util.Calendar;
@@ -10,10 +13,30 @@ import java.util.TimeZone;
  * Created by devondapuzzo on 4/25/17.
  */
 public enum Sport {
-    BASEBALL,
-    HOCKEY,
-    FOOTBALL,
-    BASKETBALL;
+    BASEBALL{
+        @Override
+        public PlayerGameStats makeStat(Player player) {
+            return new PlayerGameStatsBaseball(player);
+        }
+    },
+    HOCKEY {
+        @Override
+        public PlayerGameStats makeStat(Player player) {
+            return null;
+        }
+    },
+    FOOTBALL {
+        @Override
+        public PlayerGameStats makeStat(Player player) {
+            return null;
+        }
+    },
+    BASKETBALL {
+        @Override
+        public PlayerGameStats makeStat(Player player) {
+            return null;
+        }
+    };
 
     private String URLstring;
     private String SeasonString;
@@ -38,4 +61,6 @@ public enum Sport {
     public String getSeasonString() {
         return SeasonString;
     }
+
+    public abstract PlayerGameStats makeStat(Player player);
 }

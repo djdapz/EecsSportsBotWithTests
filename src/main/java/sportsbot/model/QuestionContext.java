@@ -3,8 +3,7 @@ package sportsbot.model;
 import sportsbot.enums.QuestionType;
 import sportsbot.enums.Sport;
 import sportsbot.enums.TemporalContext;
-import sportsbot.service.NewsService;
-import sportsbot.service.SportsApiService;
+import sportsbot.model.position.Position;
 
 import java.util.Random;
 
@@ -15,25 +14,73 @@ public class QuestionContext {
     //whitelist
     //first line of story
     //story content
+
     // players
     //buying tix
 
 
-    private String question;
-    private String response;
-    private TemporalContext temporalContext;
+
+
+
+
+    //Information Hierarchy
     private Sport sport;
-    private Game game;
-    private Player player;
-    private Team team;
-    private QuestionContext previousQuestion;
-    private boolean error = false;
-    private String errorMessage;
-    private final Integer id;
     private City city;
+    private Team team;
+    private Player player;
+    private Game game;
+    private Position position;
+
+    //Other
+
+    private String question;
+    private TemporalContext temporalContext;
+    private String response;
+    private QuestionContext previousQuestion;
+    private final Integer id;
     private boolean clarification;
     private QuestionType questionType = QuestionType.GAME_SCORE;
     private String source;
+
+
+
+    public void setCity(City city) {
+        this.city = city;
+
+        if(this.getTeam() != null && this.getTeam().getCity() != city){
+            this.setTeam(null);
+        }
+    }
+
+    public void setSport(Sport sport) {
+        this.sport = sport;
+
+        if(this.getTeam() != null && this.getTeam().getSport() != sport){
+            this.setTeam(null);
+        }
+    }
+
+    public void setTeam(Team team) {
+        if(team == null){
+            this.team = null;
+            this.player = null;
+        }else{
+            if(this.team != team){
+                this.player = null;
+            }
+            this.team = team;
+            this.sport = team.getSport();
+
+        }
+    }
+
+    public void setPlayer(Player player) {
+        this.player = player;
+    }
+
+    public void setGame(Game game){
+        this.game = game;
+    }
 
     public String getSource() {
         return source;
@@ -67,10 +114,6 @@ public class QuestionContext {
         return city;
     }
 
-    public void setCity(City city) {
-        this.city = city;
-    }
-
     public QuestionContext(Integer id) {
         this.id = id;
     }
@@ -81,22 +124,6 @@ public class QuestionContext {
 
     public Integer getId() {
         return id;
-    }
-
-    public boolean isError() {
-        return error;
-    }
-
-    public void setError(boolean error) {
-        this.error = error;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
     }
 
     public String getQuestion() {
@@ -127,34 +154,21 @@ public class QuestionContext {
         return sport;
     }
 
-    public void setSport(Sport sport) {
-        this.sport = sport;
-    }
 
     public Game getGame() {
         return game;
     }
 
-    public void setGame(Game game) {
-        this.game = game;
-    }
 
     public Player getPlayer() {
         return player;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
-    }
 
     public Team getTeam() {
         return team;
     }
 
-    public void setTeam(Team team) {
-        this.team = team;
-        this.sport = team.getSport();
-    }
 
     public void clearTeam() {
         this.team = null;
@@ -169,7 +183,6 @@ public class QuestionContext {
     }
 
     public String toString(){
-
         String questionString;
         String responseString;
         String temporalContextString;
@@ -178,8 +191,6 @@ public class QuestionContext {
         String playerString;
         String teamString;
         String previousQuestionString;
-        String errorString;
-        String errorMessageString;
         String idString;
 
         if(this.question!=null){
@@ -231,15 +242,6 @@ public class QuestionContext {
         };
 
 
-        errorString = Boolean.toString(this.error);
-
-
-        if(this.errorMessage!=null){
-            errorMessageString = this.errorMessage;
-        }else{
-            errorMessageString = "null";
-        };
-
         if(this.id!=null){
             idString = this.id.toString();
         }else{
@@ -255,9 +257,15 @@ public class QuestionContext {
                 "Player: "  +  playerString+ "\n"+
                 "Team: "  +  teamString+ "\n"+
                 "previousQuestion: "  +  previousQuestionString+ "\n"+
-                "Error: "  +  errorString+ "\n"+
-                "ErrorMessage: "  +  errorMessageString+ "\n"+
                 "ID: "  +  idString+ "\n";
 
+    }
+
+    public Position getPosition() {
+        return position;
+    }
+
+    public void setPosition(Position position) {
+        this.position = position;
     }
 }

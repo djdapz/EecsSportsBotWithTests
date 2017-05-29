@@ -2,20 +2,22 @@ package sportsbot.service;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
+import sportsbot.enums.QuestionType;
 import sportsbot.enums.Sport;
 import sportsbot.enums.TemporalContext;
 import sportsbot.exception.AmbiguousTeamException;
 import sportsbot.exception.TeamNotFoundException;
 import sportsbot.model.City;
+import sportsbot.model.Player;
 import sportsbot.model.QuestionContext;
 import sportsbot.model.Team;
+import sportsbot.model.position.Position;
 
-import resources org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by devondapuzzo on 5/10/17.
@@ -26,18 +28,27 @@ import resources org.junit.Assert.*;
 public class QuestionParserTest {
 
     @Autowired
+    private RosterService rosterService;
+
+    @Autowired
     private QuestionParser questionParser;
 
     @Autowired
-    private RosterService rosterService;
+    private PositionsService positionsService;
+
 
     private Team cubs;
     private Team whitesox;
     private Team blackhawks;
     private Team bears;
     private Team bulls;
+    private Team rockies;
+    private Team yankees;
     private City chicago;
+    private Player anthonyRizzo;
     private QuestionContext questionContext;
+    private Position pitcher;
+    private Position firstBase;
 
 
     @Before
@@ -49,7 +60,12 @@ public class QuestionParserTest {
         blackhawks = rosterService.getTeam(Sport.HOCKEY, "CHI");
         bears = rosterService.getTeam(Sport.FOOTBALL, "CHI");
         bulls = rosterService.getTeam(Sport.BASKETBALL, "CHI");
+        rockies = rosterService.getTeam(Sport.BASEBALL, "COL");
+        yankees = rosterService.getTeam(Sport.BASEBALL, "NYY");
+        anthonyRizzo = cubs.getPlayers().get("Rizzo, Anthony");
         chicago = rosterService.getCity("Chicago");
+        pitcher = positionsService.findPosition(Sport.BASEBALL, "pitcher");
+        firstBase = positionsService.findPosition(Sport.BASEBALL, "first base");
     }
 
     @Test
@@ -96,7 +112,6 @@ public class QuestionParserTest {
 
     @Test
     public void getsAllChicagoTeamsWithCityName() throws Exception {
-
         questionContext = new QuestionContext();
         questionContext.setQuestion("chicago cubs");
         questionParser.determineTeamAndSport(questionContext);
@@ -231,6 +246,114 @@ public class QuestionParserTest {
         assertEquals(questionContext.getSport(), Sport.HOCKEY);
         assertEquals(questionContext.getTeam(), blackhawks);
         assertEquals(questionContext.getTemporalContext(), TemporalContext.TOMORROW);
+    }
+
+
+    @Test
+    public void canDetermineWhenAskingAboutPlayer() throws Exception{
+        questionContext.setQuestion("How did the Cubs do?");
+
+        questionParser.parse(questionContext);
+
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+
+        questionContext.setQuestion("How did Rizzo play?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.PLAYER_PERFORMANCE);
+        assertEquals(questionContext.getPlayer(), anthonyRizzo);
+
+
+    }
+
+    @Test
+    public void switchFromPlayerToAnotherTeam() throws Exception{
+        questionContext.setQuestion("How did the Cubs do?");
+
+        questionParser.parse(questionContext);
+
+        questionContext.setQuestion("How did Rizzo play?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.PLAYER_PERFORMANCE);
+        assertEquals(questionContext.getPlayer(), anthonyRizzo);
+
+        questionContext.setQuestion("What about the Yankees?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), yankees);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.GAME_SCORE);
+        assertEquals(questionContext.getPlayer(), null);
+
+    }
+
+    @Test
+    public void switchFromPlayerToAnotherTeamViaCityName() throws Exception{
+        questionContext.setQuestion("How did the Cubs do?");
+
+        questionParser.parse(questionContext);
+
+        questionContext.setQuestion("How did Rizzo play?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.PLAYER_PERFORMANCE);
+        assertEquals(questionContext.getPlayer(), anthonyRizzo);
+
+        questionContext.setQuestion("What about Colorado?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), rockies);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.GAME_SCORE);
+        assertEquals(questionContext.getPlayer(), null);
+
+    }
+
+    @Test
+    public void switchFromPlayerToAnotherTime() throws Exception{
+        questionContext.setQuestion("How did the Cubs do?");
+
+        questionParser.parse(questionContext);
+
+        questionContext.setQuestion("How did Rizzo play?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.PLAYER_PERFORMANCE);
+        assertEquals(questionContext.getPlayer(), anthonyRizzo);
+
+        questionContext.setQuestion("What about Yesterday?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.YESTERDAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.PLAYER_PERFORMANCE);
+        assertEquals(questionContext.getPlayer(), anthonyRizzo);
+    }
+
+    @Test
+    public void askQuestionAboutPosition() throws Exception{
+        questionContext.setQuestion("How did the Cubs do?");
+
+        questionParser.parse(questionContext);
+
+        questionContext.setQuestion("Who pitched?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.POSITION_INFORMATION);
+        assertEquals(questionContext.getPosition(), pitcher);
     }
 
 }

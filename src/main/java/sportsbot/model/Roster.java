@@ -2,21 +2,24 @@ package sportsbot.model;
 
 import sportsbot.enums.Sport;
 
-import javax.persistence.criteria.CriteriaBuilder;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 /**
  * Created by devondapuzzo on 4/19/17.
  */
 public class Roster {
     private HashMap<String, Player> players;
+    private HashMap<Integer, Player> playersByID;
     private HashMap<String, Team> teams;
 
     private boolean isInitialized = false;
 
     public Roster(){
-        this.players = new HashMap<String, Player>();
-        this.teams = new HashMap<String, Team>();
+        this.players = new HashMap<>();
+        this.teams = new HashMap<>();
+        this.playersByID = new HashMap<>();
     }
 
     public void build(ArrayList<LinkedHashMap> rosterResponse, Sport sport, HashMap<String, City> cities){
@@ -44,6 +47,7 @@ public class Roster {
 
             teams.get(teamResult.get("Abbreviation")).addPlayer(player);
             players.put(player.getLastName()+", "+player.getFirstName(), player);
+            playersByID.put(player.getID(), player);
         }
 
         this.isInitialized = true;
@@ -75,6 +79,10 @@ public class Roster {
 
     public HashMap<String, Team> getTeams() {
         return teams;
+    }
+
+    public Player getPlayer(Integer playerId){
+        return playersByID.get(playerId);
     }
 
 

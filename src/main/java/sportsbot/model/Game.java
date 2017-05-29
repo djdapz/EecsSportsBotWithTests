@@ -1,9 +1,7 @@
 package sportsbot.model;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import sportsbot.enums.GameStatus;
 import sportsbot.enums.TemporalContext;
-import sportsbot.service.RosterService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,12 +17,12 @@ public class Game {
     private Team homeTeam;
     private Team awayTeam;
     private String date;
-    private int id;
-    private int homeScore;
-    private int awayScore;
+    private Integer id;
+    private Integer homeScore;
+    private Integer awayScore;
     private String gameTime;
     private String location;
-    private int inning;
+    private Integer inning;
 
     public String getLocation() {
         return location;
@@ -62,27 +60,27 @@ public class Game {
         this.date = date;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public int getHomeScore() {
+    public Integer getHomeScore() {
         return homeScore;
     }
 
-    public void setHomeScore(int homeScore) {
+    public void setHomeScore(Integer homeScore) {
         this.homeScore = homeScore;
     }
 
-    public int getAwayScore() {
+    public Integer getAwayScore() {
         return awayScore;
     }
 
-    public void setAwayScore(int awayScore) {
+    public void setAwayScore(Integer awayScore) {
         this.awayScore = awayScore;
     }
 
@@ -103,7 +101,7 @@ public class Game {
 
         this.id = Integer.parseInt((String) gamePart.get("ID"));
         this.location = (String) gamePart.get("location");
-        this.gameTime = (String) gamePart.get("time") + " Eastern Time";
+        this.gameTime = gamePart.get("time") + " Eastern Time";
 
         boolean isCompleted = Boolean.parseBoolean((String) todaysGameMap.get("isCompleted"));
         boolean isInProgress = Boolean.parseBoolean((String) todaysGameMap.get("isInProgress"));
@@ -234,4 +232,7 @@ public class Game {
         return  awayTeam.toString() + " vs " +homeTeam.toString();
     }
 
+    public String getUrlParam() {
+        return Integer.toString(id);
+    }
 }

@@ -8,7 +8,6 @@ import sportsbot.model.QuestionContext;
 public class ServerContactException extends SportsBotException {
     @Override
     public void setErrorMessage(QuestionContext questionContext) {
-        questionContext.setError(true);
-        questionContext.setErrorMessage("ERROR contacting our data source. Try again later.");
+        questionContext.setResponse("ERROR contacting our data source. Try again later.");
     }
 }

@@ -9,7 +9,7 @@ import java.util.HashMap;
  */
 public class Team {
 
-    private int ID;
+    private Integer ID;
     private City city;
     private String name;
     private String Abbreviation;
@@ -20,11 +20,11 @@ public class Team {
         players = new HashMap<String, Player>();
     }
 
-    public int getID() {
+    public Integer getID() {
         return ID;
     }
 
-    public void setID(int ID) {
+    public void setID(Integer ID) {
         this.ID = ID;
     }
 
@@ -52,7 +52,7 @@ public class Team {
         this.city = city;
     }
 
-    public HashMap getPlayers(){
+    public HashMap<String, Player> getPlayers(){
         return players;
     }
 
