@@ -47,7 +47,7 @@ public class QuestionProcessorTest {
     private Position firstBase;
 
     @Before
-    public void Setup(){
+    public void Setup() throws Exception{
         questionContext = new QuestionContext();
         questionContext.setQuestion("");
         cubs = rosterService.getTeam(Sport.BASEBALL, "CHC");
