@@ -58,13 +58,8 @@ public class QuestionProcessor {
                 questionContext.setResponse("Sorry, I couldn't find the story you're looking for. Please try again");
                 questionContext.setSource(null);
                 return questionContext;
-<<<<<<< Updated upstream
-            } else {
-                questionContext.setResponse(story.getStoryString());
-=======
             }else{
                 questionContext.setResponse(story.getDescription());
->>>>>>> Stashed changes
                 questionContext.setSource(story.getLink());
                 return questionContext;
             }
@@ -90,7 +85,7 @@ public class QuestionProcessor {
 
                 } else if (questionContext.getQuestionType() == QuestionType.POSITION_INFORMATION) {
                     rosterService.determinePositionInformation(questionContext);
-                    languageService.answerPlayerPerformance(questionContext);
+                    languageService.answerPlayerPosition(questionContext);
                 } else {
                     questionContext.setResponse(thisGame.generateGameStatusString(questionContext));
                 }

@@ -64,14 +64,14 @@ public class PositionsBaseball extends PositionsAbstract {
         position.addName("dh");
         positions.add(position);
 
-        position = new Position("1B");
+        position = new Position( "1B");
         position.addName("first base");
         position.addName("first");
         position.addName("1st base");
         position.addName("1st");
         positions.add(position);
 
-        position = new Position("2b");
+        position = new Position("2B");
         position.addName("second base");
         position.addName("second");
         position.addName("2nd base");

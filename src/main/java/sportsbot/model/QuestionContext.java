@@ -11,17 +11,8 @@ import java.util.Random;
  * Created by devondapuzzo on 4/19/17.
  */
 public class QuestionContext {
-    //whitelist
-    //first line of story
-    //story content
-
-    // players
     //buying tix
-
-
-
-
-
+    //standings stuff
 
     //Information Hierarchy
     private Sport sport;

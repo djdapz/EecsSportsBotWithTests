@@ -9,13 +9,13 @@ import sportsbot.model.QuestionContext;
 @Service
 public class LanguageService {
 
-    public void answerPlayerPerformance(QuestionContext questionContext){
+    public void answerPlayerPosition(QuestionContext questionContext){
         assert(questionContext.getPlayer() != null);
         assert(questionContext.getPosition() != null);
 
         StringBuilder response = new StringBuilder();
         response.append(questionContext.getPlayer().getName())
-                .append("")
+                .append(" ")
                 .append(questionContext.getPosition().getAction(questionContext));
 
         questionContext.setResponse(response.toString());

@@ -49,6 +49,7 @@ public class QuestionParserTest {
     private QuestionContext questionContext;
     private Position pitcher;
     private Position firstBase;
+    private Position secondBase;
 
 
     @Before
@@ -66,6 +67,7 @@ public class QuestionParserTest {
         chicago = rosterService.getCity("Chicago");
         pitcher = positionsService.findPosition(Sport.BASEBALL, "pitcher");
         firstBase = positionsService.findPosition(Sport.BASEBALL, "first base");
+        secondBase = positionsService.findPosition(Sport.BASEBALL, "second base");
     }
 
     @Test
@@ -355,5 +357,46 @@ public class QuestionParserTest {
         assertEquals(questionContext.getQuestionType(), QuestionType.POSITION_INFORMATION);
         assertEquals(questionContext.getPosition(), pitcher);
     }
+
+    @Test
+    public void changeBetweenPositions() throws Exception{
+        questionContext.setQuestion("How did the Cubs do?");
+
+        questionParser.parse(questionContext);
+
+        questionContext.setQuestion("Who pitched?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.POSITION_INFORMATION);
+        assertEquals(questionContext.getPosition(), pitcher);
+
+        questionContext.setQuestion("Who is pitching?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.POSITION_INFORMATION);
+        assertEquals(questionContext.getPosition(), pitcher);
+
+        questionContext.setQuestion("who played first?");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.POSITION_INFORMATION);
+        assertEquals(questionContext.getPosition(), firstBase);
+
+        questionContext.setQuestion("what about second");
+        questionParser.parse(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
+        assertEquals(questionContext.getQuestionType(), QuestionType.POSITION_INFORMATION);
+        assertEquals(questionContext.getPosition(), secondBase);
+    }
+
+
 
 }

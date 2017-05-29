@@ -11,10 +11,10 @@ import sportsbot.exception.TeamNotFoundException;
 import sportsbot.model.City;
 import sportsbot.model.QuestionContext;
 import sportsbot.model.Team;
+import sportsbot.model.position.Position;
 
 import java.util.ArrayList;
 
-// import regex
 
 /**
  * Created by devondapuzzo on 5/10/17.
@@ -49,7 +49,21 @@ public class QuestionParser {
 
     // should run after parse the question and figure out the team, player and city
     private  void determineQuestionType(QuestionContext questionContext) {
-        //TODO - IMPLEMENT
+        if(questionContext.getQuestionType() == QuestionType.POSITION_INFORMATION){
+            //keep question type if asking about new position
+            try {
+                Position oldPosition = questionContext.getPosition();
+                determinePosition(questionContext);
+                if(oldPosition != questionContext.getPosition()){
+                    return;
+                }
+            } catch (PositionNotFoundException ignored) {
+            }
+        }
+
+
+
+
         if (questionContext.getQuestion().toLowerCase().contains("more") || questionContext.getQuestion().toLowerCase().contains("story")) {
             if (questionContext.getTeam() != null || questionContext.getPreviousQuestion().getTeam() != null) {
                 questionContext.setQuestionType(QuestionType.NEWS);

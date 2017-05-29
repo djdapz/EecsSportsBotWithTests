@@ -199,7 +199,7 @@ public class RosterService {
         return pgs.getString(statCategories);
     }
 
-    public void determinePositionInformation(QuestionContext questionContext) throws ServerContactException, GameNotFoundException {
+    public void determinePositionInformation(QuestionContext questionContext) throws ServerContactException, PositionNotFoundException, GameNotFoundException {
         assertNotNull(questionContext.getPosition());
 
         ArrayList<LinkedHashMap> startingLineUp = getStartingLineup(questionContext);
@@ -213,7 +213,7 @@ public class RosterService {
         }
 
         if (playerId == null) {
-            throw new GameNotFoundException();
+            throw new PositionNotFoundException();
         } else {
             questionContext.setPlayer(findPlayer(questionContext, playerId));
         }
@@ -236,8 +236,10 @@ public class RosterService {
             if(Objects.equals(myID, thisID)){
                 if(questionContext.getGame().getGameStatus() == GameStatus.SCHEDULED){
                     lineupInQuestion = (ArrayList) teamLineup.get("expected").get("starter");
+                    break;
                 }else{
                     lineupInQuestion = (ArrayList) teamLineup.get("actual").get("starter");
+                    break;
                 }
             }
         }
