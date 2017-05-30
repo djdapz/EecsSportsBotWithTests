@@ -141,7 +141,6 @@ public class Game {
         String finalString;
         String teamOfInterest;
         String secondTeam;
-        String locationString;
         String scoreString;
 
         boolean toiIsHome;
@@ -156,22 +155,9 @@ public class Game {
             toiIsHome = false;
         }
 
-        locationString = " at " + this.getLocation() + " in " + this.getHomeTeam().getCity().getName() + " at " + this.getGameTime();
-
-        if(temporalContext == TemporalContext.TOMORROW){
-            locationString += " tomorrow";
-        }else if(temporalContext == TemporalContext.TODAY){
-            locationString += " today";
-        }else if(temporalContext == TemporalContext.YESTERDAY){
-            locationString += " yesterday";
-        }else{
-            locationString += temporalContext.getDateString();
-        }
-
-
         if(this.getGameStatus() == GameStatus.SCHEDULED){
             finalString =
-                    "The " + teamOfInterest + " are scheduled to play the " + secondTeam + locationString + ".";
+                    "The " + teamOfInterest + " are scheduled to play the " + secondTeam +" "+ getLocationString(temporalContext) + ".";
         }else {
 
             if(toiIsHome){
@@ -182,7 +168,7 @@ public class Game {
 
             String verbString;
             String inningString = this.getInningString();
-            String timeEnding = "";
+            String timeEnding = temporalContext.getDateString();
 
             if(this.getGameStatus() == GameStatus.INPROGRESS){
                 if((toiIsHome && homeScore > awayScore) || (!toiIsHome && awayScore > homeScore)){
@@ -195,13 +181,6 @@ public class Game {
                 }
 
             }else{
-
-                if(temporalContext == TemporalContext.TODAY){
-                    timeEnding = " today";
-                }else if(temporalContext == TemporalContext.YESTERDAY){
-                    timeEnding = " yesterday";
-                }
-
                 if((toiIsHome && homeScore > awayScore) || (!toiIsHome && awayScore > homeScore)){
                     //Team of interest won
                     verbString = " beat the ";
@@ -210,7 +189,7 @@ public class Game {
                 }
             }
 
-            finalString = "The " + teamOfInterest + verbString + secondTeam +" "+ scoreString+ inningString+ timeEnding+".";
+            finalString = "The " + teamOfInterest + verbString + secondTeam +" "+ scoreString+ inningString+" "+ timeEnding+".";
         }
 
         return finalString;
@@ -230,6 +209,20 @@ public class Game {
         }
     }
 
+    private String getLocationString(TemporalContext temporalContext){
+        StringBuilder locationString = new StringBuilder();
+        locationString.append(" at ")
+                .append( this.getLocation())
+                .append(" in ")
+                .append(this.getHomeTeam().getCity().getName())
+                .append(" at ")
+                .append(this.getGameTime())
+                .append(temporalContext.getDateString());
+
+        return locationString.toString();
+
+    }
+
     public String toString(){
         return  awayTeam.toString() + " vs " +homeTeam.toString();
     }
@@ -237,4 +230,12 @@ public class Game {
     public String getUrlParam() {
         return Integer.toString(id);
     }
-}
+
+    public Team getOpposingTeam(Team team) {
+        if(homeTeam == team){
+            return awayTeam;
+        }
+
+        return homeTeam;
+    }
+};

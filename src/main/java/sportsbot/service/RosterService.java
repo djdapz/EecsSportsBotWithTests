@@ -145,10 +145,20 @@ public class RosterService {
         ArrayList<Player> players = new ArrayList<>();
         String question = questionContext.getQuestion().toLowerCase();
         Team thisTeam = rosters.get(questionContext.getSport()).getTeams().get(questionContext.getTeam().getAbbreviation());
+        Team opposingTeam = null;
 
         for(Player player: thisTeam.getPlayers().values()){
             if(question.contains(player.getFirstName().toLowerCase()) || question.contains(player.getLastName().toLowerCase())){
                 players.add(player);
+            }
+        }
+
+        if(questionContext.getGame() != null){
+            opposingTeam = rosters.get(questionContext.getSport()).getTeams().get(questionContext.getGame().getOpposingTeam(questionContext.getTeam()).getAbbreviation());
+            for(Player player: opposingTeam.getPlayers().values()){
+                if(question.contains(player.getFirstName().toLowerCase()) || question.contains(player.getLastName().toLowerCase())){
+                    players.add(player);
+                }
             }
         }
 

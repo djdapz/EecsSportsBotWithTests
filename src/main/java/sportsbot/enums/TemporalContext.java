@@ -1,6 +1,7 @@
 package sportsbot.enums;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 /**
@@ -32,22 +33,52 @@ public enum TemporalContext {
     }
 
     public String getDateString() {
-        return "hey";
+        if(this ==TODAY || this == TOMORROW || this == YESTERDAY){
+            return this.toString().toLowerCase();
+        }
+
+
+        Locale locale = Locale.getDefault();
+        Calendar calendar = getCalendar();
+
+        String month = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, locale);
+        String year = Integer.toString(calendar.get(Calendar.YEAR));
+        String day = Integer.toString(calendar.get(Calendar.DATE));
+        String dayOfWeek = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, locale);
+
+        StringBuilder sb = new StringBuilder();
+
+        return sb.append(dayOfWeek)
+                .append(" ")
+                .append(month)
+                .append(" ")
+                .append(day)
+                .append(", ")
+                .append(year).toString();
+    }
+
+    private Calendar getCalendar(){
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Chicago"));
+        // create a calendar
+        Calendar cal = Calendar.getInstance();
+
+        cal.add(Calendar.DAY_OF_MONTH, offset);
+        return cal;
     }
 
 
     public String getDateURLString(){
-        Calendar now = Calendar.getInstance();
-        now.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
+        Calendar cal = getCalendar();
 
-        Integer year = now.get(now.YEAR);
-        Integer month = now.get(now.MONTH)+1;
-        Integer day = now.get(now.DATE) + offset;
+        // get the value of all the calendar date fields.
+        Integer year =  cal.get(Calendar.YEAR);
+        Integer month =  cal.get(Calendar.MONTH);
+        Integer day =  cal.get(Calendar.DATE);
+        month++;
 
-        if(now.get(now.HOUR_OF_DAY) < 3) {
+        if(cal.get(Calendar.HOUR_OF_DAY) < 3) {
             day--;
         }
-
 
         String yearS = Integer.toString(year);
         String monthS = Integer.toString(month);

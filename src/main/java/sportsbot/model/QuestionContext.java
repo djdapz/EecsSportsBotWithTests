@@ -33,10 +33,40 @@ public class QuestionContext {
     private QuestionType questionType = QuestionType.GAME_SCORE;
     private String source;
 
-
+    //flags
+//    private boolean queryContainTeam = false;
+//    private boolean queryContainCity = false;
+//    private boolean queryContainPlayer = false;
+//    private boolean queryContainPosition = false;
+//
+//
+//    private void resetFlags() {
+//        queryContainTeam = false;
+//        queryContainCity = false;
+//        queryContainPlayer = false;
+//        queryContainPosition = false;
+//    }
+//
+//    public boolean doesQueryContainTeam() {
+//        return queryContainTeam;
+//    }
+//
+//    public boolean doesQueryContainCity() {
+//        return queryContainCity;
+//    }
+//
+//    public boolean doesQueryContainsPlayer() {
+//        return queryContainPlayer;
+//    }
+//
+//    public boolean doesQueryContainPosition() {
+//        return queryContainPosition;
+//    }
 
     public void setCity(City city) {
-        this.city = city;
+        if(city != this.getCity()){
+            this.city = city;
+        }
 
         if(this.getTeam() != null && this.getTeam().getCity() != city){
             this.setTeam(null);
@@ -52,16 +82,16 @@ public class QuestionContext {
     }
 
     public void setTeam(Team team) {
-        if(team == null){
+        if(team == null) {
             this.team = null;
             this.player = null;
-        }else{
-            if(this.team != team){
-                this.player = null;
-            }
+            return;
+        }
+
+        if(this.team != team){
+            this.player = null;
             this.team = team;
             this.sport = team.getSport();
-
         }
     }
 
@@ -122,6 +152,7 @@ public class QuestionContext {
     }
 
     public void setQuestion(String question) {
+        this.setSource(null);
         this.question = question;
     }
 
@@ -258,5 +289,11 @@ public class QuestionContext {
 
     public void setPosition(Position position) {
         this.position = position;
+    }
+
+
+    public boolean containsCityOrTeam() {
+        return (question.toLowerCase().contains(team.getName().toLowerCase())
+                || question.toLowerCase().contains(team.getCity().getName().toLowerCase()));
     }
 }

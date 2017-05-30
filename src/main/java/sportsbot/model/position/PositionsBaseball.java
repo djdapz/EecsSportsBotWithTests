@@ -81,12 +81,13 @@ public class PositionsBaseball extends PositionsAbstract {
 
 
     @Override
-    public Position searchQueryForPosition(String query) throws PositionNotFoundException {
+    public Position searchQueryForPosition(String query) throws PositionNotFoundException{
         for(Position position: positions){
             if(position.isPositionInQuery(query)){
                 return position;
             }
         }
+
         throw new PositionNotFoundException();
     }
 

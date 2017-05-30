@@ -22,7 +22,7 @@ public class PositionsService {
         positionsHashMap.put(Sport.BASEBALL, new PositionsBaseball());
     }
 
-    public Position findPosition(QuestionContext  questionContext) throws PositionNotFoundException {
+    public Position findPosition(QuestionContext  questionContext)  throws PositionNotFoundException{
         return positionsHashMap.get(questionContext.getSport()).searchQueryForPosition(questionContext.getQuestion().toLowerCase());
     }
 

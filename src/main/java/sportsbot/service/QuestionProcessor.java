@@ -90,6 +90,7 @@ public class QuestionProcessor {
                     questionContext.setResponse(thisGame.generateGameStatusString(questionContext));
                 }
             } catch (SportsBotException e) {
+                e.setErrorMessage(questionContext);
                 e.printStackTrace();
             }
             return questionContext;

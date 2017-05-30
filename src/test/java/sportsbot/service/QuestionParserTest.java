@@ -77,7 +77,7 @@ public class QuestionParserTest {
         QuestionContext questionContext = new QuestionContext();
         questionContext.setQuestion(question);
 
-        questionParser.determineTemporalContest(questionContext);
+        questionParser.determineTemporalContext(questionContext);
         assertEquals(questionContext.getTemporalContext(), TemporalContext.TODAY);
 
     }

@@ -17,6 +17,7 @@ import sportsbot.model.position.Position;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.TimeZone;
 // import regex
 
 
@@ -34,7 +35,7 @@ public class QuestionParser {
     private PositionsService positionsService;
 
     public  void parse(QuestionContext questionContext) throws AmbiguousTeamException, TeamNotFoundException, PositionNotFoundException {
-        determineTemporalContest(questionContext);
+        determineTemporalContext(questionContext);
         try {
             determineTeamAndSport(questionContext);
             searchForPlayer(questionContext);
@@ -42,39 +43,41 @@ public class QuestionParser {
             if(questionContext.getQuestionType() == QuestionType.POSITION_INFORMATION){
                 determinePosition(questionContext);
             }
-        } catch (AmbiguousTeamException | PositionNotFoundException e) {
+        } catch (AmbiguousTeamException e) {
             throw e;
         } catch (TeamNotFoundException e) {
             if(questionContext.getTeam() == null){
                 throw e;
             }
+        } catch (PositionNotFoundException e){
+            questionContext.setQuestionType(QuestionType.GAME_SCORE);
         }
     }
 
     // should run after parse the question and figure out the team, player and city
     private  void determineQuestionType(QuestionContext questionContext) {
-        if(questionContext.getQuestionType() == QuestionType.POSITION_INFORMATION){
+        if(questionContext.getQuestionType() == QuestionType.POSITION_INFORMATION) {
             //keep question type if asking about new position
+            Position oldPosition = questionContext.getPosition();
             try {
-                Position oldPosition = questionContext.getPosition();
                 determinePosition(questionContext);
-                if(oldPosition != questionContext.getPosition()){
+                if (oldPosition != questionContext.getPosition()) {
                     return;
                 }
             } catch (PositionNotFoundException ignored) {
             }
         }
 
-
-
-
         if (questionContext.getQuestion().toLowerCase().contains("more") || questionContext.getQuestion().toLowerCase().contains("story")) {
             if (questionContext.getTeam() != null || questionContext.getPreviousQuestion().getTeam() != null) {
                 questionContext.setQuestionType(QuestionType.NEWS);
-                return;
             }
         }else if(questionContext.getQuestion().toLowerCase().contains("who")){
-            questionContext.setQuestionType(QuestionType.POSITION_INFORMATION);
+            if(questionContext.containsCityOrTeam()) {
+                questionContext.setQuestionType(QuestionType.GAME_SCORE);
+            }else{
+                questionContext.setQuestionType(QuestionType.POSITION_INFORMATION);
+            }
         }else if(questionContext.getPlayer() != null){
             questionContext.setQuestionType(QuestionType.PLAYER_PERFORMANCE);
         }else{
@@ -96,10 +99,12 @@ public class QuestionParser {
         return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
     }
 
-    public  void determineTemporalContest(QuestionContext questionContext){
+    public  void determineTemporalContext(QuestionContext questionContext){
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Chicago"));
         String question = questionContext.getQuestion().toLowerCase();
         Parser parser = new Parser();
         Date today = parser.parse("today").get(0).getDates().get(0);
+
         today = dateReformat(today);
         Date date;
         try {
@@ -164,7 +169,7 @@ public class QuestionParser {
         }
     }
 
-    private  void searchForPlayer(QuestionContext questionContext) {
+    private void searchForPlayer(QuestionContext questionContext) {
         rosterService.findPlayer(questionContext);
     }
 

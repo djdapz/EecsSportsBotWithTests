@@ -16,6 +16,7 @@ import sportsbot.model.Team;
 import sportsbot.model.position.Position;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Created by devondapuzzo on 5/17/17.
@@ -177,6 +178,26 @@ public class QuestionProcessorTest {
         assertEquals(questionContext.getTemporalContext(), TemporalContext.YESTERDAY);
         assertEquals(questionContext.getQuestionType(), QuestionType.POSITION_INFORMATION);
         assertEquals(questionContext.getPosition(), firstBase);
+
+    }
+
+    @Test
+    public void canDetermineGameInFuture() throws Exception{
+        questionContext.setQuestion("Who are the cubs playing on 7/2?");
+        questionProcessor.answer(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.FUTURE);
+        assertEquals(questionContext.getQuestionType(), QuestionType.GAME_SCORE);
+        assertTrue(questionContext.getResponse().toLowerCase().contains("reds"));
+
+        questionContext.setQuestion("Who are the cubs playing on may 7th?");
+        questionProcessor.answer(questionContext);
+        assertEquals(questionContext.getSport(), Sport.BASEBALL);
+        assertEquals(questionContext.getTeam(), cubs);
+        assertEquals(questionContext.getTemporalContext(), TemporalContext.PAST);
+        assertEquals(questionContext.getQuestionType(), QuestionType.GAME_SCORE);
+        assertTrue(questionContext.getResponse().toLowerCase().contains("yankees"));
 
     }
 
