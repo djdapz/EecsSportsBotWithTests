@@ -14,6 +14,12 @@ import sportsbot.model.Team;
 import sportsbot.model.position.Position;
 
 import java.util.ArrayList;
+import com.joestelmach.natty.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Calendar;
+// import regex
 
 
 /**
@@ -78,17 +84,50 @@ public class QuestionParser {
         }
     }
 
+    private static Date dateReformat(Date date) {
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        cal.set(Calendar.HOUR_OF_DAY,0);
+        cal.set(Calendar.MINUTE,0);
+        cal.set(Calendar.SECOND,0);
+        cal.set(Calendar.MILLISECOND,0);
+        return cal.getTime();
+    }
+
+    private static int daysBetween(Date d1, Date d2){
+        return (int)( (d2.getTime() - d1.getTime()) / (1000 * 60 * 60 * 24));
+    }
+
     public  void determineTemporalContest(QuestionContext questionContext){
         //TODO ask for dates
         String question = questionContext.getQuestion().toLowerCase();
-
-        if(question.contains("today")){
+        Parser parser = new Parser();
+        Date today = parser.parse("today").get(0).getDates().get(0);
+        today = dateReformat(today);
+        Date date = null;
+        try {
+            System.out.println(question);
+            date = parser.parse(question).get(0).getDates().get(0);
+            date = dateReformat(date);
+            System.out.println(date.toString());
+        } catch (Exception e) {
+            ;
+        }
+        int offset = 0;
+        if (date != null) offset = daysBetween(today, date);
+        if(offset == 0){
             questionContext.setTemporalContext(TemporalContext.TODAY);
-        }else if(question.contains("yesterday")){
+        }else if(offset == -1){
             questionContext.setTemporalContext(TemporalContext.YESTERDAY);
-        }else if(question.contains("tomorrow")){
+        }else if(offset == 1){
             questionContext.setTemporalContext(TemporalContext.TOMORROW);
-        }else if(questionContext.getTemporalContext() == null){
+        }else if(offset > 1){
+            questionContext.setTemporalContext(TemporalContext.FUTURE);
+            questionContext.getTemporalContext().setOffset(offset);
+        }else if(offset < -1){
+            questionContext.setTemporalContext(TemporalContext.PAST);
+            questionContext.getTemporalContext().setOffset(offset);
+        }else {
             questionContext.setTemporalContext(TemporalContext.TODAY);
         }
     }
