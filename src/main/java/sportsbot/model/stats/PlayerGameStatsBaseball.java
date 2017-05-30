@@ -13,7 +13,6 @@ public class PlayerGameStatsBaseball extends PlayerGameStatsAbstract{
         super(player);
     }
 
-
     @Override
     public String getDefensiveString() {
         HashMap<String, PlayerStat> defensiveStats = this.getCategorizedStats().get("Fielding");
@@ -37,7 +36,6 @@ public class PlayerGameStatsBaseball extends PlayerGameStatsAbstract{
         return outputBuilder.toString();
 
     }
-
 
     @Override
     public String getOffensiveString(){
@@ -184,7 +182,6 @@ public class PlayerGameStatsBaseball extends PlayerGameStatsAbstract{
         public static final String BATTER_INTENTIONAL_WALKS = "IBB";
 
         public static final String STOLEN_BASES = "SB";
-
         public static final String RUNS = "R";
 
         public static final String BATTER_STRIKEOUT = "SO";
@@ -196,7 +193,6 @@ public class PlayerGameStatsBaseball extends PlayerGameStatsAbstract{
         public static final String BATTER_SAC_FLIES = "SF";
 
         //DEFENSIVE
-
         public static final String FIELDER_TAG_OUTS = "FTO";
         public static final String FIELDER_PUT_OUTS = "FPO";
 

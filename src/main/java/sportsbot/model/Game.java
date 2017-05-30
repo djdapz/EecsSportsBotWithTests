@@ -164,6 +164,8 @@ public class Game {
             locationString += " today";
         }else if(temporalContext == TemporalContext.YESTERDAY){
             locationString += " yesterday";
+        }else{
+            locationString += temporalContext.getDateString();
         }
 
 

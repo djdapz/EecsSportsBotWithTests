@@ -25,7 +25,7 @@ public class QuestionContext {
     //Other
 
     private String question;
-    private TemporalContext temporalContext;
+    private TemporalContext temporalContext = TemporalContext.TODAY;
     private String response;
     private QuestionContext previousQuestion;
     private final Integer id;

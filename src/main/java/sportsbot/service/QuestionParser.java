@@ -1,5 +1,6 @@
 package sportsbot.service;
 
+import com.joestelmach.natty.Parser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import sportsbot.enums.QuestionType;
@@ -14,11 +15,8 @@ import sportsbot.model.Team;
 import sportsbot.model.position.Position;
 
 import java.util.ArrayList;
-import com.joestelmach.natty.*;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
 import java.util.Calendar;
+import java.util.Date;
 // import regex
 
 
@@ -103,14 +101,12 @@ public class QuestionParser {
         Parser parser = new Parser();
         Date today = parser.parse("today").get(0).getDates().get(0);
         today = dateReformat(today);
-        Date date = null;
+        Date date;
         try {
-            System.out.println(question);
             date = parser.parse(question).get(0).getDates().get(0);
             date = dateReformat(date);
-            System.out.println(date.toString());
         } catch (Exception e) {
-            ;
+            return;
         }
         int offset = 0;
         if (date != null) offset = daysBetween(today, date);
@@ -132,10 +128,9 @@ public class QuestionParser {
         }else if(offset < -1){
             questionContext.setTemporalContext(TemporalContext.PAST);
             questionContext.getTemporalContext().setOffset(offset);
-        }else {
+        }else if(questionContext.getTemporalContext() == null){
             questionContext.setTemporalContext(TemporalContext.TODAY);
         }
-        System.out.println(offset + " "+ questionContext.getTemporalContext().toString());
     }
 
     public  void determineTeamAndSport(QuestionContext questionContext) throws AmbiguousTeamException, TeamNotFoundException {

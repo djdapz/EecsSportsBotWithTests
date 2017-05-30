@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import sportsbot.enums.Sport;
+import sportsbot.enums.TemporalContext;
 import sportsbot.exception.PlayerHasntPlayedException;
 import sportsbot.exception.ServerContactException;
 import sportsbot.exception.TeamNotPlayingException;
@@ -41,13 +42,13 @@ public class SportsApiService {
         return headers;
     }
 
-    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, Integer offset, ArrayList<Param> params){
+    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, TemporalContext temporalContext, ArrayList<Param> params){
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders httpHeaders = createHeaders("djdapz", "goCats");
 
         StringBuilder url = new StringBuilder();
 
-        String dateString = getToday(offset);
+        String dateString = temporalContext.getDateURLString();
 
         String seasonString = sport.getSeasonString();
 
@@ -73,12 +74,12 @@ public class SportsApiService {
         return restTemplate.exchange(url.toString(), HttpMethod.GET, new HttpEntity<Object>(httpHeaders), Object.class);
     }
 
-    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, Integer offset){
-        return contactApi(sport, requestType, offset, null);
+    private static ResponseEntity<Object> contactApi(Sport sport, String requestType, TemporalContext temporalContext){
+        return contactApi(sport, requestType, temporalContext, null);
     }
 
     private static ResponseEntity<Object> contactApi(Sport sport, String requestType){
-        return contactApi(sport, requestType, 0, null);
+        return contactApi(sport, requestType, TemporalContext.TODAY, null);
     }
 
     public static ArrayList<LinkedHashMap> getRostersFromAPI(Sport sport){
@@ -94,9 +95,8 @@ public class SportsApiService {
     public static LinkedHashMap getGame(QuestionContext questionContext) throws TeamNotPlayingException, ServerContactException {
 
         Team team = questionContext.getTeam();
-        Integer offset = questionContext.getTemporalContext().getOffset();
 
-        ResponseEntity<Object> response = contactApi(questionContext.getSport(),"scoreboard", offset);
+        ResponseEntity<Object> response = contactApi(questionContext.getSport(),"scoreboard", questionContext.getTemporalContext());
 
         if(response.getStatusCode().value() != 200){
             throw new ServerContactException();
@@ -125,45 +125,13 @@ public class SportsApiService {
         throw new TeamNotPlayingException(team);
     }
 
-    public static String getToday(){
-        return getToday(0);
-    }
-
-    public static String getToday(Integer offset){
-        Calendar now = Calendar.getInstance();
-        now.setTimeZone(TimeZone.getTimeZone("America/Chicago"));
-
-        Integer year = now.get(now.YEAR);
-        Integer month = now.get(now.MONTH)+1;
-        Integer day = now.get(now.DATE) + offset;
-
-        if(now.get(now.HOUR_OF_DAY) < 3) {
-            day--;
-        }
-
-
-        String yearS = Integer.toString(year);
-        String monthS = Integer.toString(month);
-        String dayS = Integer.toString(day);
-
-        if(monthS.length() == 1){
-            monthS = "0" + monthS;
-        }
-
-        if(dayS.length() == 1){
-            dayS = "0" + dayS;
-        }
-
-        return yearS + monthS + dayS;
-
-    }
 
     public static ArrayList<LinkedHashMap> getPlayerStats(QuestionContext questionContext) throws ServerContactException, PlayerHasntPlayedException {
 
         ArrayList<Param> params = new ArrayList<>();
         params.add(new Param("player", questionContext.getPlayer().getUrlParam()));
 
-        ResponseEntity<Object> response = contactApi(questionContext.getSport(), "daily_player_stats", questionContext.getTemporalContext().getOffset(), params);
+        ResponseEntity<Object> response = contactApi(questionContext.getSport(), "daily_player_stats", questionContext.getTemporalContext(), params);
 
         if(response.getStatusCode().value() != 200){
             throw new ServerContactException();
@@ -188,7 +156,7 @@ public class SportsApiService {
         params.add(new Param("gameid", questionContext.getGame().getUrlParam()));
 
 
-        ResponseEntity<Object> response = contactApi(questionContext.getSport(), "game_startinglineup", questionContext.getTemporalContext().getOffset(), params);
+        ResponseEntity<Object> response = contactApi(questionContext.getSport(), "game_startinglineup", questionContext.getTemporalContext(), params);
 
         if(response.getStatusCode().value() != 200){
             throw new ServerContactException();
