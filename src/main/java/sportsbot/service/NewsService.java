@@ -39,9 +39,9 @@ public class NewsService
 {
     private static List<String> whiteList = new ArrayList<String>();
     public NewsService() {
-        whiteList.add("espn");
-        whiteList.add("yahoo");
-        whiteList.add("cbssports");
+//        whiteList.add("espn");
+//        whiteList.add("yahoo");
+//        whiteList.add("cbssports");
 //        whiteList.add("nbcsports");
 //        whiteList.add("foxsports");
 //        whiteList.add("cnn");
@@ -124,6 +124,7 @@ public class NewsService
             builder.setParameter("safesearch", "Moderate");
 
             URI uri = builder.build();
+            System.out.println(sb.toString());
             System.out.println(uri.toString());
             HttpGet request = new HttpGet(uri);
             request.setHeader("Ocp-Apim-Subscription-Key", "e9f923377a944bc8885330a050af76f1");

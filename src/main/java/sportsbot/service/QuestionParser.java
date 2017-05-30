@@ -99,7 +99,6 @@ public class QuestionParser {
     }
 
     public  void determineTemporalContest(QuestionContext questionContext){
-        //TODO ask for dates
         String question = questionContext.getQuestion().toLowerCase();
         Parser parser = new Parser();
         Date today = parser.parse("today").get(0).getDates().get(0);
@@ -115,6 +114,12 @@ public class QuestionParser {
         }
         int offset = 0;
         if (date != null) offset = daysBetween(today, date);
+        else {
+            if (questionContext.getPreviousQuestion() != null) {
+                questionContext.setTemporalContext(questionContext.getPreviousQuestion().getTemporalContext());
+                return;
+            }
+        }
         if(offset == 0){
             questionContext.setTemporalContext(TemporalContext.TODAY);
         }else if(offset == -1){
@@ -130,6 +135,7 @@ public class QuestionParser {
         }else {
             questionContext.setTemporalContext(TemporalContext.TODAY);
         }
+        System.out.println(offset + " "+ questionContext.getTemporalContext().toString());
     }
 
     public  void determineTeamAndSport(QuestionContext questionContext) throws AmbiguousTeamException, TeamNotFoundException {
