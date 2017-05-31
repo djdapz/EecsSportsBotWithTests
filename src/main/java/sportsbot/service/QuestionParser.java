@@ -106,17 +106,19 @@ public class QuestionParser {
         Date today = parser.parse("today").get(0).getDates().get(0);
 
         today = dateReformat(today);
-        Date date;
+        Date date = null;
         try {
             date = parser.parse(question).get(0).getDates().get(0);
             date = dateReformat(date);
         } catch (Exception e) {
-            return;
+            System.out.println("error in parser question date");
         }
         int offset = 0;
         if (date != null) offset = daysBetween(today, date);
         else {
+            System.out.println("here");
             if (questionContext.getPreviousQuestion() != null) {
+                System.out.println(questionContext.getPreviousQuestion().getTemporalContext().toString());
                 questionContext.setTemporalContext(questionContext.getPreviousQuestion().getTemporalContext());
                 return;
             }

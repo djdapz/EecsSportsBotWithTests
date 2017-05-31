@@ -87,14 +87,14 @@ public class NewsService
             sb.append(" ");
             sb.append(qc.getTeam().getName());
             sb.append(" ");
-            sb.append(qc.getTemporalContext().toString());
+            sb.append(qc.getTemporalContext().getDateString());
         } else if (qc.getTeam() != null){
             sb.append(qc.getTeam().getName());
             if (qc.getTeam().getCity() != null) {
                 sb.append(" ");
                 sb.append(qc.getTeam().getCity().getName());
             }
-            sb.append(" ").append(qc.getTemporalContext().toString());
+            sb.append(" ").append(qc.getTemporalContext().getDateString());
         } else if (qc.getPreviousQuestion().getPlayer() != null) {
             sb.append(qc.getPreviousQuestion().getPlayer().getFirstName());
             sb.append(" ");
@@ -102,14 +102,14 @@ public class NewsService
             sb.append(" ");
             sb.append(qc.getPreviousQuestion().getTeam().getName());
             sb.append(" ");
-            sb.append(qc.getPreviousQuestion().getTemporalContext().toString());
+            sb.append(qc.getPreviousQuestion().getTemporalContext().getDateString());
         } else {
             sb.append(qc.getPreviousQuestion().getTeam().getName());
             if (qc.getPreviousQuestion().getTeam().getCity() != null) {
                 sb.append(" ");
                 sb.append(qc.getPreviousQuestion().getTeam().getCity().getName());
             }
-            sb.append(" ").append(qc.getPreviousQuestion().getTemporalContext().toString());
+            sb.append(" ").append(qc.getPreviousQuestion().getTemporalContext().getDateString());
         }
 //        https://www.bing.com/search?q=site%3A+%28espn.com+yahoo.com+cbssports.com+nbcsports.com+foxsports.com+cnn.com+nytimes.com+bleacherreport.com+sbnation.com+rantsports.com+%29+Cubs%2BChicago%2BTODAY&go=Submit&qs=n&form=QBLH&sp=-1&pq=site%3A+%28espn.com+yahoo.com+cbssports.com+nbcsports.com+foxsports.com+cnn.com+nytimes.com+bleacherreport.com+sbnation.com+rantsports.com+%29+cubs%2Bchicago%2Btoday&sc=0-155&sk=&cvid=164E1EF275874899BEBD56A50F818D5C
 //        System.out.println(sb.toString());
