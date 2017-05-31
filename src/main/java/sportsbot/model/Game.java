@@ -106,13 +106,26 @@ public class Game {
         boolean isCompleted = Boolean.parseBoolean((String) todaysGameMap.get("isCompleted"));
         boolean isInProgress = Boolean.parseBoolean((String) todaysGameMap.get("isInProgress"));
 
-        if(isCompleted){
-            this.gameStatus = GameStatus.COMPLETED;
-        }else if(isInProgress){
-            this.gameStatus = GameStatus.INPROGRESS;
-        }else{
+        try{
+            ArrayList innings = (ArrayList) ((LinkedHashMap) todaysGameMap.get("inningSummary")).get("inning");
+            if(innings.size() >= 9){
+                this.gameStatus = GameStatus.COMPLETED;
+            }else if(innings.size() > 0){
+                this.gameStatus = GameStatus.INPROGRESS;
+            }else{
+                this.gameStatus = GameStatus.SCHEDULED;
+            }
+        }catch (Exception e){
             this.gameStatus = GameStatus.SCHEDULED;
         }
+
+//        if(isCompleted){
+//            this.gameStatus = GameStatus.COMPLETED;
+//        }else if(isInProgress){
+//            this.gameStatus = GameStatus.INPROGRESS;
+//        }else{
+//            this.gameStatus = GameStatus.SCHEDULED;
+//        }
 
         if(this.gameStatus == GameStatus.COMPLETED ||  this.gameStatus == GameStatus.INPROGRESS){
             this.homeScore = Integer.parseInt((String) todaysGameMap.get("homeScore"));

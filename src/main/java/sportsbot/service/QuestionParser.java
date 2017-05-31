@@ -55,7 +55,7 @@ public class QuestionParser {
     }
 
     // should run after parse the question and figure out the team, player and city
-    private  void determineQuestionType(QuestionContext questionContext) {
+    private  void determineQuestionType(QuestionContext questionContext) throws PositionNotFoundException {
         if(questionContext.getQuestionType() == QuestionType.POSITION_INFORMATION) {
             //keep question type if asking about new position
             Position oldPosition = questionContext.getPosition();
@@ -73,12 +73,14 @@ public class QuestionParser {
                 questionContext.setQuestionType(QuestionType.NEWS);
             }
         }else if(questionContext.getQuestion().toLowerCase().contains("who")){
-            if(questionContext.containsCityOrTeam()) {
-                questionContext.setQuestionType(QuestionType.GAME_SCORE);
-            }else{
+            try{
+                determinePosition(questionContext);
                 questionContext.setQuestionType(QuestionType.POSITION_INFORMATION);
-            }
-        }else if(questionContext.getPlayer() != null){
+            }catch (PositionNotFoundException e){
+                questionContext.setQuestionType(QuestionType.GAME_SCORE);
+            };
+
+        }else if(questionContext.getPlayer() != null && !questionContext.containsCityOrTeam() && !questionContext.getQuestion().toLowerCase().contains("team") && !questionContext.getQuestion().toLowerCase().contains("they")){
             questionContext.setQuestionType(QuestionType.PLAYER_PERFORMANCE);
         }else{
             questionContext.setQuestionType(QuestionType.GAME_SCORE);
@@ -182,10 +184,12 @@ public class QuestionParser {
         }
 
 
+
         return statCategories;
     }
 
     public void determinePosition(QuestionContext questionContext) throws PositionNotFoundException {
         questionContext.setPosition(positionsService.findPosition(questionContext));
     }
+
 }

@@ -23,7 +23,7 @@ public class TeamNotPlayingException extends SportsBotException {
         }else if(questionContext.getTemporalContext() == TemporalContext.TOMORROW) {
             questionContext.setResponse("It looks like the "+questionContext.getTeam().getName()+" aren't playing tomorrow.");
         }else {
-            questionContext.setResponse("It looks like the "+questionContext.getTeam().getName()+" aren't playing today.");
+            questionContext.setResponse("It looks like the "+questionContext.getTeam().getName()+" aren't playing on " + questionContext.getTemporalContext().getDateString() + ".");
         }
     }
 

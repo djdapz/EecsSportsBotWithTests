@@ -155,6 +155,10 @@ public class RosterService {
 
         if(questionContext.getGame() != null){
             opposingTeam = rosters.get(questionContext.getSport()).getTeams().get(questionContext.getGame().getOpposingTeam(questionContext.getTeam()).getAbbreviation());
+            if(opposingTeam.getPlayers() == null){
+                new Exception().printStackTrace();
+                return;
+            }
             for(Player player: opposingTeam.getPlayers().values()){
                 if(question.contains(player.getFirstName().toLowerCase()) || question.contains(player.getLastName().toLowerCase())){
                     players.add(player);
@@ -209,10 +213,14 @@ public class RosterService {
         return pgs.getString(statCategories);
     }
 
-    public void determinePositionInformation(QuestionContext questionContext) throws ServerContactException, PositionNotFoundException, GameNotFoundException {
+    public void determinePositionInformation(QuestionContext questionContext) throws ServerContactException, PositionNotFoundException, GameNotFoundException, LineupNotAvailableException {
         assertNotNull(questionContext.getPosition());
-
-        ArrayList<LinkedHashMap> startingLineUp = getStartingLineup(questionContext);
+        ArrayList<LinkedHashMap> startingLineUp = null;
+        try{
+            startingLineUp= getStartingLineup(questionContext);
+        }catch (LineupNotAvailableException e){
+            throw e;
+        }
         Integer playerId = null;
 
         for (LinkedHashMap position : startingLineUp) {
@@ -229,7 +237,7 @@ public class RosterService {
         }
     }
 
-    private ArrayList<LinkedHashMap> getStartingLineup(QuestionContext questionContext) throws ServerContactException, GameNotFoundException {
+    private ArrayList<LinkedHashMap> getStartingLineup(QuestionContext questionContext) throws ServerContactException, GameNotFoundException, LineupNotAvailableException {
         assert(questionContext.getGame() != null);
         assert(questionContext.getGame().getId() != null);
         assert(questionContext.getTeam() != null);
@@ -238,21 +246,26 @@ public class RosterService {
         ArrayList<LinkedHashMap<String, HashMap>>startingLineup = SportsApiService.getStartingLineup(questionContext);
         ArrayList lineupInQuestion = null;
 
-        for(LinkedHashMap<String, HashMap> teamLineup: startingLineup){
+        try{
+            for(LinkedHashMap<String, HashMap> teamLineup: startingLineup){
 
-            Integer myID = questionContext.getTeam().getID();
-            Integer thisID = Integer.parseInt((String) teamLineup.get("team").get("ID"));
+                Integer myID = questionContext.getTeam().getID();
+                Integer thisID = Integer.parseInt((String) teamLineup.get("team").get("ID"));
 
-            if(Objects.equals(myID, thisID)){
-                if(questionContext.getGame().getGameStatus() == GameStatus.SCHEDULED){
-                    lineupInQuestion = (ArrayList) teamLineup.get("expected").get("starter");
-                    break;
-                }else{
-                    lineupInQuestion = (ArrayList) teamLineup.get("actual").get("starter");
-                    break;
+                if(Objects.equals(myID, thisID)){
+                    if(questionContext.getGame().getGameStatus() == GameStatus.SCHEDULED){
+                        lineupInQuestion = (ArrayList) teamLineup.get("expected").get("starter");
+                        break;
+                    }else{
+                        lineupInQuestion = (ArrayList) teamLineup.get("actual").get("starter");
+                        break;
+                    }
                 }
             }
+        }catch (NullPointerException e){
+            throw new LineupNotAvailableException();
         }
+
 
         if(lineupInQuestion == null){
             throw new GameNotFoundException();

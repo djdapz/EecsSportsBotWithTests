@@ -18,9 +18,17 @@ public class PlayerGameStatsBaseball extends PlayerGameStatsAbstract{
         HashMap<String, PlayerStat> defensiveStats = this.getCategorizedStats().get("Fielding");
         ArrayList<String> scoringItems = new ArrayList<>();
 
+        String pitchingStats = "";
+
+        if(this.getPlayer().getPosition().equals("P")){
+            pitchingStats = getPlayer().getName() + getPitchingString();
+
+        }
+
         StringBuilder outputBuilder = new StringBuilder();
 
         outputBuilder
+                .append(pitchingStats)
                 .append(" He played ")
                 .append(defensiveStats.get(Constants.INNINGS_PLAYED).getValue())
                 .append(" innings")
@@ -87,6 +95,13 @@ public class PlayerGameStatsBaseball extends PlayerGameStatsAbstract{
         scoringItems.add(getConditionalPhrase(battingStats, Constants.RUNS, "run"));
 
         return processListOfPhrases(scoringItems, "He never scored.", "He got");
+
+    }
+
+    public String getPitchingString() {
+        HashMap<String, PlayerStat> pitchingStats = this.getCategorizedStats().get("Pitching");
+        return " threw " + pitchingStats.get(Constants.PITCHES_THROWN).getValue() + " pitches, " + pitchingStats.get(Constants.PITCHER_STRIKES).getValue()+" strikes and got "+pitchingStats.get(Constants.PITCHER_STRIKEOUTS).getValue()+" strikeouts.";
+
 
     }
 
@@ -199,6 +214,13 @@ public class PlayerGameStatsBaseball extends PlayerGameStatsAbstract{
         public static final String ERRORS = "E";
         public static final String INNINGS_PLAYED = "INN";
         public static final String DOUBLE_PLAYS = "FDP";
+
+
+        //PITCHING
+        public static final String PITCHER_STRIKES = "Str";
+        public static final String PITCHER_STRIKEOUTS = "SO";
+        public static final String PITCHES_THROWN = "NP";
+
 
     }
 
