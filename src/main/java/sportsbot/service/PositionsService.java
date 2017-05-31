@@ -16,7 +16,7 @@ import java.util.HashMap;
 
 @Service
 public class PositionsService {
-    HashMap<Sport, Positions> positionsHashMap = new HashMap<>();
+    private HashMap<Sport, Positions> positionsHashMap = new HashMap<>();
 
     public PositionsService(){
         positionsHashMap.put(Sport.BASEBALL, new PositionsBaseball());

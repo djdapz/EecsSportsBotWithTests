@@ -13,12 +13,9 @@ public class LanguageService {
         assert(questionContext.getPlayer() != null);
         assert(questionContext.getPosition() != null);
 
-        StringBuilder response = new StringBuilder();
-        response.append(questionContext.getPlayer().getName())
-                .append(" ")
-                .append(questionContext.getPosition().getAction(questionContext));
+        String response = questionContext.getPlayer().getName() + " " + questionContext.getPosition().getAction(questionContext);
 
-        questionContext.setResponse(response.toString());
+        questionContext.setResponse(response);
     }
 
 

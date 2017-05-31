@@ -101,7 +101,7 @@ public class Game {
 
         this.id = Integer.parseInt((String) gamePart.get("ID"));
         this.location = (String) gamePart.get("location");
-        this.gameTime = gamePart.get("time") + " Eastern Time";
+        this.gameTime = gamePart.get("time") + " Eastern Time ";
 
         boolean isCompleted = Boolean.parseBoolean((String) todaysGameMap.get("isCompleted"));
         boolean isInProgress = Boolean.parseBoolean((String) todaysGameMap.get("isInProgress"));
@@ -114,7 +114,6 @@ public class Game {
             this.gameStatus = GameStatus.SCHEDULED;
         }
 
-        //TODO - consider live access
         if(this.gameStatus == GameStatus.COMPLETED ||  this.gameStatus == GameStatus.INPROGRESS){
             this.homeScore = Integer.parseInt((String) todaysGameMap.get("homeScore"));
             this.awayScore = Integer.parseInt((String) todaysGameMap.get("awayScore"));

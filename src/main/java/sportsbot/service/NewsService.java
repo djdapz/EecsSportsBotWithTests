@@ -1,11 +1,8 @@
 package sportsbot.service;
 
-import org.springframework.stereotype.Service;
-import sportsbot.enums.QuestionType;
-import sportsbot.model.QuestionContext;
-import sportsbot.model.Story;
-
-import java.net.URI;
+import com.gravity.goose.Article;
+import com.gravity.goose.Configuration;
+import com.gravity.goose.Goose;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -13,26 +10,25 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-//import org.apache.http.entity.StringEntity;
-// json package
 import org.json.JSONArray;
 import org.json.JSONObject;
-// goose package
-import com.gravity.goose.*;
-// rake
+import org.springframework.stereotype.Service;
+import sportsbot.enums.QuestionType;
+import sportsbot.model.QuestionContext;
+import sportsbot.model.Story;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
+//import org.apache.http.entity.StringEntity;
+// json package
+// goose package
+// rake
 // list
-import java.util.*;
 
 /**
  * Created by devondapuzzo on 5/15/17.
- */
-/*
-TODO:
-add white list site:(espn.com)
-extract main content by goose
-extract key words
-
  */
 @Service
 public class NewsService
@@ -88,28 +84,37 @@ public class NewsService
             sb.append(qc.getTeam().getName());
             sb.append(" ");
             sb.append(qc.getTemporalContext().getDateString());
-        } else if (qc.getTeam() != null){
+//        } else if (qc.getTeam() != null){
+//            sb.append(qc.getTeam().getName());
+//            if (qc.getTeam().getCity() != null) {
+//                sb.append(" ");
+//                sb.append(qc.getTeam().getCity().getName());
+//            }
+//            sb.append(" ").append(qc.getTemporalContext().getDateString());
+        } else if (qc.getPlayer() != null) {
+            sb.append(qc.getPlayer().getFirstName());
+            sb.append(" ");
+            sb.append(qc.getPlayer().getLastName());
+            sb.append(" ");
+            sb.append(qc.getTeam().getName());
+            sb.append(" performance ");
+            sb.append(qc.getTemporalContext().getDateString());
+        } else if(qc.getGame()!= null){
+            sb.append(qc.getGame().getAwayTeam().getName());
+            sb.append(" vs ");
+            sb.append(qc.getGame().getHomeTeam().getName());
+            if (qc.getTeam().getCity() != null) {
+                sb.append(" ");
+                sb.append(qc.getTeam().getCity().getName());
+            }
+            sb.append(" ").append(qc.getTemporalContext().getDateString());
+        }else{
             sb.append(qc.getTeam().getName());
             if (qc.getTeam().getCity() != null) {
                 sb.append(" ");
                 sb.append(qc.getTeam().getCity().getName());
             }
             sb.append(" ").append(qc.getTemporalContext().getDateString());
-        } else if (qc.getPreviousQuestion().getPlayer() != null) {
-            sb.append(qc.getPreviousQuestion().getPlayer().getFirstName());
-            sb.append(" ");
-            sb.append(qc.getPreviousQuestion().getPlayer().getLastName());
-            sb.append(" ");
-            sb.append(qc.getPreviousQuestion().getTeam().getName());
-            sb.append(" ");
-            sb.append(qc.getPreviousQuestion().getTemporalContext().getDateString());
-        } else {
-            sb.append(qc.getPreviousQuestion().getTeam().getName());
-            if (qc.getPreviousQuestion().getTeam().getCity() != null) {
-                sb.append(" ");
-                sb.append(qc.getPreviousQuestion().getTeam().getCity().getName());
-            }
-            sb.append(" ").append(qc.getPreviousQuestion().getTemporalContext().getDateString());
         }
 //        https://www.bing.com/search?q=site%3A+%28espn.com+yahoo.com+cbssports.com+nbcsports.com+foxsports.com+cnn.com+nytimes.com+bleacherreport.com+sbnation.com+rantsports.com+%29+Cubs%2BChicago%2BTODAY&go=Submit&qs=n&form=QBLH&sp=-1&pq=site%3A+%28espn.com+yahoo.com+cbssports.com+nbcsports.com+foxsports.com+cnn.com+nytimes.com+bleacherreport.com+sbnation.com+rantsports.com+%29+cubs%2Bchicago%2Btoday&sc=0-155&sk=&cvid=164E1EF275874899BEBD56A50F818D5C
 //        System.out.println(sb.toString());
